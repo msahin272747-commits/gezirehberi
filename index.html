@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Türkiye Gezi ve Lezzet Rehberi</title>
+    <style>
+        :root { --primary: #2563eb; --bg: #f8fafc; --card-bg: #ffffff; --text: #0f172a; --text-light: #64748b; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 40px; }
+        header { background: var(--primary); color: white; padding: 20px 15px; text-align: center; }
+        .container { max-width: 800px; margin: 0 auto; padding: 15px; }
+        .filter-box { background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
+        select, button { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px; }
+        .category-buttons { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .btn-filter { background: #e2e8f0; color: var(--text); border: none; font-weight: 500; }
+        .btn-filter.active { background: var(--primary); color: white; }
+        .cards-grid { display: flex; flex-direction: column; gap: 15px; }
+        .card { background: var(--card-bg); border-radius: 12px; position: relative; border: 1px solid #f1f5f9; }
+        .badge-sponsor { position: absolute; top: 10px; right: 10px; background: #eab308; color: white; padding: 4px 8px; font-size: 12px; font-weight: bold; border-radius: 6px; }
+        .card-content { padding: 15px; }
+        .card-title { font-size: 18px; margin-bottom: 5px; }
+        .card-meta { font-size: 13px; color: var(--text-light); margin-bottom: 10px; }
+        .card-desc { font-size: 14px; color: #334155; margin-bottom: 15px; }
+        .map-btn { display: inline-block; text-align: center; background: #10b981; color: white; text-decoration: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <header><h1>📍 Türkiye Keşif Rehberi</h1></header>
+    <div class="container">
+        <div class="filter-box">
+            <select id="citySelect" onchange="filterData()">
+                <option value="">Tüm İller (81 İl)</option>
+                <option value="İstanbul">İstanbul</option>
+                <option value="Ankara">Ankara</option>
+                <option value="İzmir">İzmir</option>
+            </select>
+            <div class="category-buttons">
+                <button class="btn-filter active" onclick="setCategory('hepsi', this)">Tümü</button>
+                <button class="btn-filter" onclick="setCategory('Müze', this)">🏛️ Müzeler</button>
+                <button class="btn-filter" onclick="setCategory('Gezi', this)">📍 Gezi</button>
+                <button class="btn-filter" onclick="setCategory('Yemek', this)">🍔 Yemek</button>
+                <button class="btn-filter" onclick="setCategory('Sponsor', this)">💰 Sponsorlu</button>
+            </div>
+        </div>
+        <div id="cardsContainer" class="cards-grid"></div>
+    </div>
+    <script>
+        const places = [
+            { id: 1, name: "Ayasofya-i Kebîr Cami-i Şerîfi", city: "İstanbul", category: "Müze", desc: "Tarihin en önemli yapılardan biri.", isSponsor: true, mapUrl: "https://maps.google.com/?q=Ayasofya" },
+            { id: 2, name: "Anıtkabir", city: "Ankara", category: "Gezi", desc: "Mustafa Kemal Atatürk'ün anıt mezarı.", isSponsor: false, mapUrl: "https://maps.google.com/?q=Anitkabir" }
+        ];
+        let selectedCategory = 'hepsi';
+        function setCategory(cat, btn) {
+            selectedCategory = cat;
+            document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterData();
+        }
+        function filterData() {
+            const selectedCity = document.getElementById('citySelect').value;
+            const container = document.getElementById('cardsContainer');
+            container.innerHTML = '';
+            const filtered = places.filter(place => {
+                const cityMatch = selectedCity === '' || place.city === selectedCity;
+                let catMatch = selectedCategory === 'Sponsor' ? place.isSponsor : (selectedCategory === 'hepsi' || place.category === selectedCategory);
+                return cityMatch && catMatch;
+            });
+            filtered.forEach(place => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    ${place.isSponsor ? '<span class="badge-sponsor">Sponsorlu</span>' : ''}
+                    <div class="card-content">
+                        <div class="card-title">${place.name}</div>
+                        <div class="card-meta">📍 ${place.city} | 🏷️ ${place.category}</div>
+                        <div class="card-desc">${place.desc}</div>
+                        <a href="${place.mapUrl}" target="_blank" class="map-btn">🗺️ Google Maps'te Aç</a>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        filterData();
+    </script>
+</body>
+</html>
