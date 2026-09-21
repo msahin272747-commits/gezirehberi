@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Abdulkadir Konukoğlu Anadolu Lisesi">
+  <circle cx="50" cy="50" r="47" fill="#fff" stroke="#d4af37" stroke-width="6"/>
+  <circle cx="50" cy="50" r="37" fill="#b91c1c"/>
+  <path d="M50 22l6.5 16.5L74 40l-13.5 11 4.5 17L50 59 35 68l4.5-17L26 40l17.5-1.5z" fill="#fff"/>
+  <text x="50" y="88" text-anchor="middle" fill="#fff" font-family="Arial" font-size="10" font-weight="700">AKAL</text>
+</svg>

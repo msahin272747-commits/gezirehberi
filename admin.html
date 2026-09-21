@@ -1,120 +1,19 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Paneli - Gezi Rehberi</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 p-4 max-w-md mx-auto min-h-screen">
-
-  <!-- Şifre Ekranı -->
-  <div id="loginBox" class="bg-white p-6 rounded-xl shadow mt-10">
-    <h2 class="text-xl font-bold mb-4 text-center">Admin Girişi</h2>
-    <input type="password" id="adminPass" placeholder="Giriş Şifresi" class="w-full p-2 border rounded mb-4">
-    <button onclick="login()" class="w-full bg-blue-600 text-white font-bold py-2 rounded">Giriş Yap</button>
-  </div>
-
-  <!-- Panel -->
-  <div id="adminPanel" class="hidden">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-xl font-bold">Yeni Mekan Ekle</h1>
-      <a href="/index.html" class="text-sm text-blue-600">Siteye Dön</a>
-    </div>
-
-    <form id="addForm" onsubmit="savePlace(event)" class="bg-white p-4 rounded-xl shadow space-y-3">
-      <div>
-        <label class="text-xs font-semibold">Mekan Adı</label>
-        <input type="text" id="pName" required class="w-full p-2 border rounded text-sm">
-      </div>
-
-      <div>
-        <label class="text-xs font-semibold">Şehir</label>
-        <select id="pCity" required class="w-full p-2 border rounded text-sm"></select>
-      </div>
-
-      <div>
-        <label class="text-xs font-semibold">Kategori</label>
-        <select id="pCategory" class="w-full p-2 border rounded text-sm">
-          <option>Gezilecek Yerler</option>
-          <option>Yeme İçme</option>
-          <option>Doğa & Açık Alan</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="text-xs font-semibold">Görsel URL (Resim Bağlantısı)</label>
-        <input type="url" id="pImage" placeholder="https://..." class="w-full p-2 border rounded text-sm">
-      </div>
-
-      <div>
-        <label class="text-xs font-semibold">Google Maps Linki</label>
-        <input type="url" id="pMaps" placeholder="https://maps.google.com/..." class="w-full p-2 border rounded text-sm">
-      </div>
-
-      <div>
-        <label class="text-xs font-semibold">Açıklama</label>
-        <textarea id="pDesc" class="w-full p-2 border rounded text-sm" rows="2"></textarea>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <input type="checkbox" id="pSponsor">
-        <label for="pSponsor" class="text-sm font-semibold">Öne Çıkar / Sponsorlu Yap</label>
-      </div>
-
-      <button type="submit" class="w-full bg-green-600 text-white font-bold py-2 rounded">Kaydet ve Yayınla</button>
-    </form>
-
-    <div id="status" class="mt-4 text-center font-semibold"></div>
-  </div>
-
-  <script>
-    const SUPABASE_URL = "https://ozeahphasprxmsentwnw.supabase.co";
-    const SUPABASE_KEY = "Sb_publishable_4F3EOqMc368uEyg0aPEdAg_9pd7Y007";
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    const cities = ["Adana","Adıyaman","Afyonkarahisar","Ağrı","Aksaray","Amasya","Ankara","Antalya","Ardahan","Artvin","Aydın","Balıkesir","Bartın","Batman","Bayburt","Bilecik","Bingöl","Bitlis","Bolu","Burdur","Bursa","Çanakkale","Çankırı","Çorum","Denizli","Diyarbakır","Düzce","Edirne","Elazığ","Erzincan","Erzurum","Eskişehir","Gaziantep","Giresun","Gümüşhane","Hakkari","Hatay","Iğdır","Isparta","İstanbul","İzmir","Kahramanmaraş","Karabük","Karaman","Kars","Kastamonu","Kayseri","Kırıkkale","Kırklareli","Kırşehir","Kilis","Kocaeli","Konya","Kütahya","Malatya","Manisa","Mardin","Mersin","Muğla","Muş","Nevşehir","Niğde","Ordu","Osmaniye","Rize","Sakarya","Samsun","Siirt","Sinop","Sivas","Şanlıurfa","Şırnak","Tekirdağ","Tokat","Trabzon","Tunceli","Uşak","Van","Yalova","Yozgat","Zonguldak"];
-
-    const pCity = document.getElementById("pCity");
-    cities.forEach(c => pCity.innerHTML += `<option value="${c}">${c}</option>`);
-
-    function login() {
-      const pass = document.getElementById("adminPass").value;
-      if (pass === "123456") {
-        document.getElementById("loginBox").classList.add("hidden");
-        document.getElementById("adminPanel").classList.remove("hidden");
-      } else {
-        alert("Yanlış şifre!");
-      }
-    }
-
-    async function savePlace(e) {
-      e.preventDefault();
-      const status = document.getElementById("status");
-      status.innerText = "Kaydediliyor...";
-
-      const newPlace = {
-        name: document.getElementById("pName").value,
-        city: document.getElementById("pCity").value,
-        category: document.getElementById("pCategory").value,
-        image_url: document.getElementById("pImage").value,
-        maps_url: document.getElementById("pMaps").value,
-        description: document.getElementById("pDesc").value,
-        is_sponsored: document.getElementById("pSponsor").checked
-      };
-
-      const { error } = await db.from('places').insert([newPlace]);
-
-      if (error) {
-        status.innerText = "Hata oluştu: " + error.message;
-        status.className = "mt-4 text-center text-red-500 font-semibold";
-      } else {
-        status.innerText = "Mekan başarıyla eklendi!";
-        status.className = "mt-4 text-center text-green-600 font-semibold";
-        document.getElementById("addForm").reset();
-      }
-    }
-  </script>
-</body>
-</html>
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Yönetim Paneli</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.tailwindcss.com"></script><style>body{background:radial-gradient(circle at top,#e9efff,#f8fafc 45%)}.glass{background:#ffffffc9;backdrop-filter:blur(12px)}.tab.active{background:#3159d8;color:white}.tab{transition:.18s}.view{display:none}.view.active{display:block}</style></head>
+<body class="min-h-screen p-4 text-slate-800"><main class="mx-auto max-w-5xl">
+  <section id="loginBox" class="glass mx-auto mt-16 max-w-md rounded-3xl border border-white p-7 shadow-xl"><p class="text-center text-sm font-bold text-blue-600">MATEMATİK ATÖLYESİ</p><h1 class="mt-1 text-center text-2xl font-bold">Yönetici Girişi</h1><p class="mt-2 text-center text-sm text-slate-500">Yetkili Supabase hesabınızla giriş yapın.</p><form id="loginForm" class="mt-6 space-y-3"><input id="adminEmail" type="email" required autocomplete="username" placeholder="E-posta" class="w-full rounded-xl border p-3"><input id="adminPass" type="password" required autocomplete="current-password" placeholder="Şifre" class="w-full rounded-xl border p-3"><button class="w-full rounded-xl bg-blue-700 p-3 font-bold text-white">Giriş Yap</button></form><p id="loginStatus" class="mt-4 text-center text-sm" role="alert"></p></section>
+  <section id="adminPanel" class="hidden"><header class="glass mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-5 shadow-sm"><div><p class="text-xs font-bold text-blue-600">YÖNETİM</p><h1 class="text-2xl font-bold">Matematik Atölyesi</h1></div><div class="flex gap-3"><a href="index.html" class="rounded-xl bg-white px-4 py-2 text-sm font-bold text-blue-700 shadow">Siteye dön</a><button id="logout" class="bg-slate-800 px-4 py-2 text-sm">Çıkış</button></div></header>
+  <nav class="glass mt-4 flex gap-2 overflow-x-auto rounded-2xl border p-2"> <button class="tab active whitespace-nowrap px-4 py-2 text-sm" data-view="dashboard">▦ Dashboard</button><button class="tab whitespace-nowrap px-4 py-2 text-sm" data-view="questions">? Sorular</button><button class="tab whitespace-nowrap px-4 py-2 text-sm" data-view="sponsors">★ Sponsorlar</button><button class="tab whitespace-nowrap px-4 py-2 text-sm" data-view="announcements">♢ Duyurular</button><button class="tab whitespace-nowrap px-4 py-2 text-sm" data-view="stats">◷ İstatistikler</button><button class="tab whitespace-nowrap px-4 py-2 text-sm" data-view="settings">⚙ Ayarlar</button></nav>
+  <section id="dashboard" class="view active mt-5"><div class="grid gap-4 sm:grid-cols-3"><div class="glass rounded-2xl border p-5"><b>Soru bankası</b><p class="mt-2 text-3xl font-bold">400</p><p class="text-sm text-slate-500">200 köklü · 200 üslü</p></div><div class="glass rounded-2xl border p-5"><b>Sponsorlar</b><p id="sponsorCount" class="mt-2 text-3xl font-bold">0</p><p class="text-sm text-slate-500">Aktif kayıtlar</p></div><div class="glass rounded-2xl border p-5"><b>Sürüm</b><p class="mt-2 text-3xl font-bold">v1.3</p><p class="text-sm text-slate-500">Yayın bağlantısı korunur</p></div></div></section>
+  <section id="questions" class="view mt-5 glass rounded-2xl border p-6"><h2 class="text-xl font-bold">Sorular</h2><p class="mt-2 text-slate-600">Soru bankası merkezi olarak ana sayfada doğrulanan 400 sorudan oluşur. Her soruda konu, seçenek benzersizliği ve doğru cevap eşleşmesi oluşturulurken denetlenir.</p><div class="mt-4 grid gap-3 sm:grid-cols-2"><div class="rounded-xl bg-blue-50 p-4"><b>Köklü İfadeler</b><br>200 soru · yalnızca <code>root</code></div><div class="rounded-xl bg-blue-50 p-4"><b>Üslü İfadeler</b><br>200 soru · yalnızca <code>exponent</code></div></div></section>
+  <section id="sponsors" class="view mt-5 glass rounded-2xl border p-6"><h2 class="text-xl font-bold">Sponsorlar</h2><p class="mt-1 text-sm text-slate-500">Sadece aktif sponsorlar ana sayfada görünür; örnek sponsor gösterilmez.</p><form id="sponsorForm" class="mt-5 grid gap-3 sm:grid-cols-2"><input id="sName" required placeholder="Sponsor adı" class="rounded-xl border p-3"><select id="sLevel" class="rounded-xl border p-3"><option>ALTIN</option><option>GÜMÜŞ</option><option>BRONZ</option></select><input id="sLogo" type="url" placeholder="Logo URL (isteğe bağlı)" class="rounded-xl border p-3"><input id="sUrl" type="url" placeholder="Bağlantı URL" class="rounded-xl border p-3"><textarea id="sDesc" placeholder="Açıklama" class="rounded-xl border p-3 sm:col-span-2"></textarea><label class="flex items-center gap-2 text-sm"><input id="sActive" type="checkbox" checked> Aktif olarak yayınla</label><button class="sm:col-span-2">Sponsor kaydet</button></form><div id="sponsorList" class="mt-5 grid gap-3"></div></section>
+  <section id="announcements" class="view mt-5 glass rounded-2xl border p-6"><h2 class="text-xl font-bold">Duyurular</h2><p class="mt-2 text-slate-500">Duyuru kaydı için sunucuda yetkili bir veri kaynağı yapılandırılmalıdır. Bu panel rastgele veya gerçek dışı veri üretmez.</p></section><section id="stats" class="view mt-5 glass rounded-2xl border p-6"><h2 class="text-xl font-bold">İstatistikler</h2><p class="mt-2 text-slate-500">Ziyaretçi, oturum, süre ve cihaz verileri ancak analitik servisi bağlandığında gösterilir. Veri bulunmadığı için sayı uydurulmaz.</p></section><section id="settings" class="view mt-5 glass rounded-2xl border p-6"><h2 class="text-xl font-bold">Ayarlar</h2><p class="mt-2 text-slate-500">Sürüm: v1.3 · Dağıtım yolu değişmeden göreli bağlantılar kullanılmaktadır.</p></section></section>
+</main><script>
+const SUPABASE_URL='https://ozeahphasprxmsentwnw.supabase.co',SUPABASE_KEY='Sb_publishable_4F3EOqMc368uEyg0aPEdAg_9pd7Y007',db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);function status(message,good=false){$('loginStatus').textContent=message;$('loginStatus').className='mt-4 text-center text-sm '+(good?'text-green-700':'text-red-600')}
+async function showPanel(){const {data:{session}}=await db.auth.getSession();$('loginBox').classList.toggle('hidden',!!session);$('adminPanel').classList.toggle('hidden',!session);if(session)renderSponsors()}
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();status('Giriş yapılıyor...',true);try{const {error}=await db.auth.signInWithPassword({email:$('adminEmail').value,password:$('adminPass').value});if(error)throw error;status('Giriş başarılı.',true);showPanel()}catch(error){status(error.message||'Giriş yanıtı doğrulanamadı. Lütfen tekrar deneyin.')}});
+$('logout').onclick=async()=>{await db.auth.signOut();showPanel()};document.querySelectorAll('.tab').forEach(tab=>tab.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));tab.classList.add('active');$(tab.dataset.view).classList.add('active')});
+function sponsors(){return JSON.parse(localStorage.getItem('sponsors')||'[]')}function renderSponsors(){const data=sponsors();$('sponsorCount').textContent=data.filter(x=>x.active).length;$('sponsorList').innerHTML=data.length?data.map((s,i)=>'<article class="rounded-xl border bg-white p-4"><b>'+s.level+' · '+s.name+'</b><p class="text-sm text-slate-500">'+(s.description||'Açıklama yok')+'</p><p class="text-xs">'+(s.active?'Aktif':'Pasif')+'</p><button class="mt-2 bg-red-600 px-3 py-1 text-xs" onclick="removeSponsor('+i+')">Sil</button></article>').join(''):'<p class="text-sm text-slate-500">Henüz sponsor eklenmedi.</p>'}function removeSponsor(i){const data=sponsors();data.splice(i,1);localStorage.setItem('sponsors',JSON.stringify(data));renderSponsors()}
+$('sponsorForm').addEventListener('submit',e=>{e.preventDefault();const data=sponsors();data.push({name:$('sName').value,level:$('sLevel').value,logo:$('sLogo').value,url:$('sUrl').value||'#',description:$('sDesc').value,active:$('sActive').checked});localStorage.setItem('sponsors',JSON.stringify(data));e.target.reset();$('sActive').checked=true;renderSponsors()});showPanel();
+</script></body></html>
