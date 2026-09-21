@@ -1,120 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Paneli - Gezi Rehberi</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="0; url=/index.html#admin">
+  <title>Admin Paneli | KÖK & ÜS</title>
 </head>
-<body class="bg-gray-100 p-4 max-w-md mx-auto min-h-screen">
-
-  <!-- Şifre Ekranı -->
-  <div id="loginBox" class="bg-white p-6 rounded-xl shadow mt-10">
-    <h2 class="text-xl font-bold mb-4 text-center">Admin Girişi</h2>
-    <input type="password" id="adminPass" placeholder="Giriş Şifresi" class="w-full p-2 border rounded mb-4">
-    <button onclick="login()" class="w-full bg-blue-600 text-white font-bold py-2 rounded">Giriş Yap</button>
-  </div>
-
-  <!-- Panel -->
-  <div id="adminPanel" class="hidden">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-xl font-bold">Yeni Mekan Ekle</h1>
-      <a href="/index.html" class="text-sm text-blue-600">Siteye Dön</a>
-    </div>
-
-    <form id="addForm" onsubmit="savePlace(event)" class="bg-white p-4 rounded-xl shadow space-y-3">
-      <div>
-        <label class="text-xs font-semibold">Mekan Adı</label>
-        <input type="text" id="pName" required class="w-full p-2 border rounded text-sm">
-      </div>
-
-      <div>
-        <label class="text-xs font-semibold">Şehir</label>
-        <select id="pCity" required class="w-full p-2 border rounded text-sm"></select>
-      </div>
-
-      <div>
-        <label class="text-xs font-semibold">Kategori</label>
-        <select id="pCategory" class="w-full p-2 border rounded text-sm">
-          <option>Gezilecek Yerler</option>
-          <option>Yeme İçme</option>
-          <option>Doğa & Açık Alan</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="text-xs font-semibold">Görsel URL (Resim Bağlantısı)</label>
-        <input type="url" id="pImage" placeholder="https://..." class="w-full p-2 border rounded text-sm">
-      </div>
-
-      <div>
-        <label class="text-xs font-semibold">Google Maps Linki</label>
-        <input type="url" id="pMaps" placeholder="https://maps.google.com/..." class="w-full p-2 border rounded text-sm">
-      </div>
-
-      <div>
-        <label class="text-xs font-semibold">Açıklama</label>
-        <textarea id="pDesc" class="w-full p-2 border rounded text-sm" rows="2"></textarea>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <input type="checkbox" id="pSponsor">
-        <label for="pSponsor" class="text-sm font-semibold">Öne Çıkar / Sponsorlu Yap</label>
-      </div>
-
-      <button type="submit" class="w-full bg-green-600 text-white font-bold py-2 rounded">Kaydet ve Yayınla</button>
-    </form>
-
-    <div id="status" class="mt-4 text-center font-semibold"></div>
-  </div>
-
-  <script>
-    const SUPABASE_URL = "https://ozeahphasprxmsentwnw.supabase.co";
-    const SUPABASE_KEY = "Sb_publishable_4F3EOqMc368uEyg0aPEdAg_9pd7Y007";
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    const cities = ["Adana","Adıyaman","Afyonkarahisar","Ağrı","Aksaray","Amasya","Ankara","Antalya","Ardahan","Artvin","Aydın","Balıkesir","Bartın","Batman","Bayburt","Bilecik","Bingöl","Bitlis","Bolu","Burdur","Bursa","Çanakkale","Çankırı","Çorum","Denizli","Diyarbakır","Düzce","Edirne","Elazığ","Erzincan","Erzurum","Eskişehir","Gaziantep","Giresun","Gümüşhane","Hakkari","Hatay","Iğdır","Isparta","İstanbul","İzmir","Kahramanmaraş","Karabük","Karaman","Kars","Kastamonu","Kayseri","Kırıkkale","Kırklareli","Kırşehir","Kilis","Kocaeli","Konya","Kütahya","Malatya","Manisa","Mardin","Mersin","Muğla","Muş","Nevşehir","Niğde","Ordu","Osmaniye","Rize","Sakarya","Samsun","Siirt","Sinop","Sivas","Şanlıurfa","Şırnak","Tekirdağ","Tokat","Trabzon","Tunceli","Uşak","Van","Yalova","Yozgat","Zonguldak"];
-
-    const pCity = document.getElementById("pCity");
-    cities.forEach(c => pCity.innerHTML += `<option value="${c}">${c}</option>`);
-
-    function login() {
-      const pass = document.getElementById("adminPass").value;
-      if (pass === "123456") {
-        document.getElementById("loginBox").classList.add("hidden");
-        document.getElementById("adminPanel").classList.remove("hidden");
-      } else {
-        alert("Yanlış şifre!");
-      }
-    }
-
-    async function savePlace(e) {
-      e.preventDefault();
-      const status = document.getElementById("status");
-      status.innerText = "Kaydediliyor...";
-
-      const newPlace = {
-        name: document.getElementById("pName").value,
-        city: document.getElementById("pCity").value,
-        category: document.getElementById("pCategory").value,
-        image_url: document.getElementById("pImage").value,
-        maps_url: document.getElementById("pMaps").value,
-        description: document.getElementById("pDesc").value,
-        is_sponsored: document.getElementById("pSponsor").checked
-      };
-
-      const { error } = await db.from('places').insert([newPlace]);
-
-      if (error) {
-        status.innerText = "Hata oluştu: " + error.message;
-        status.className = "mt-4 text-center text-red-500 font-semibold";
-      } else {
-        status.innerText = "Mekan başarıyla eklendi!";
-        status.className = "mt-4 text-center text-green-600 font-semibold";
-        document.getElementById("addForm").reset();
-      }
-    }
-  </script>
+<body>
+  <p>Admin paneline yönlendiriliyorsunuz. <a href="/index.html#admin">Devam etmek için tıklayın.</a></p>
+  <script>location.replace('/index.html#admin');</script>
 </body>
 </html>
