@@ -64,6 +64,35 @@ function sortPlayers(players) {
   });
 }
 
+/*
+ * Oyuncu istatistikleri yalnızca artan değerlerden oluşuyor.
+ * Bu nedenle eski/stale bir cihazın merkezi veriyi geri düşürmesini
+ * engellemek için kümülatif alanlarda büyük olan değeri koruyoruz.
+ *
+ * Örnek:
+ * Merkezi Mustafa = 500 puan
+ * Eski telefondaki Mustafa = 450 puan
+ * PUT gelirse sonuç yine 500 puan olur.
+ */
+function mergePlayer(existing, incoming) {
+  const oldPlayer = cleanPlayer(existing || {});
+  const newPlayer = cleanPlayer(incoming || {});
+
+  return {
+    name: newPlayer.name || oldPlayer.name,
+    points: Math.max(oldPlayer.points, newPlayer.points),
+    correct: Math.max(oldPlayer.correct, newPlayer.correct),
+    wrong: Math.max(oldPlayer.wrong, newPlayer.wrong),
+    games: Math.max(oldPlayer.games, newPlayer.games),
+    bestCombo: Math.max(oldPlayer.bestCombo, newPlayer.bestCombo),
+    combo: newPlayer.combo,
+    quickCorrect: Math.max(oldPlayer.quickCorrect, newPlayer.quickCorrect),
+    radicalCorrect: Math.max(oldPlayer.radicalCorrect, newPlayer.radicalCorrect),
+    exponentCorrect: Math.max(oldPlayer.exponentCorrect, newPlayer.exponentCorrect),
+    lastGame: newPlayer.lastGame || oldPlayer.lastGame
+  };
+}
+
 export async function onRequestGet(context) {
   try {
     const env = context.env;
@@ -104,7 +133,6 @@ export async function onRequestGet(context) {
   }
 }
 
-
 export async function onRequestPut(context) {
   try {
     const env = context.env;
@@ -130,9 +158,10 @@ export async function onRequestPut(context) {
     const incoming = cleanPlayers(body.players);
 
     /*
-     * Mevcut merkezi veriyi önce oku.
-     * Böylece farklı cihazlardan gelen kayıtların
-     * tamamını yanlışlıkla silmeyiz.
+     * Merkezi veriyi önce oku.
+     * Ardından gelen her oyuncuyu mevcut kayıtla birleştir.
+     * Böylece farklı kullanıcıların kayıtları birbirini silmez
+     * ve eski bir cihaz daha yeni puanı geri düşüremez.
      */
     const existingRaw = await env.KOKUS_DATA.get(DATA_KEY);
 
@@ -147,9 +176,6 @@ export async function onRequestPut(context) {
       }
     }
 
-    /*
-     * Gelen oyuncuları merkezi listeyle birleştir.
-     */
     for (const [name, incomingPlayer] of Object.entries(incoming)) {
       const existingName = Object.keys(existing).find(
         key =>
@@ -157,11 +183,14 @@ export async function onRequestPut(context) {
           name.toLocaleLowerCase("tr-TR")
       );
 
-      if (existingName && existingName !== name) {
-        delete existing[existingName];
+      if (existingName) {
+        existing[existingName] = mergePlayer(
+          existing[existingName],
+          incomingPlayer
+        );
+      } else {
+        existing[name] = cleanPlayer(incomingPlayer);
       }
-
-      existing[name] = incomingPlayer;
     }
 
     const players = cleanPlayers(existing);
