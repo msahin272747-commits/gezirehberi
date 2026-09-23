@@ -1,0 +1,8 @@
+name = "akalmat"
+main = "./dist/worker/index.js"
+compatibility_date = "2026-09-22"
+
+[assets]
+directory = "."
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
