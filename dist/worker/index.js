@@ -19,27 +19,17 @@ function cleanPlayer(p) {
     quickCorrect: Number(p?.quickCorrect) || 0,
     radicalCorrect: Number(p?.radicalCorrect) || 0,
     exponentCorrect: Number(p?.exponentCorrect) || 0,
-    lastGame: String(
-      p?.lastGame || "Henüz oyun oynanmadı"
-    ).slice(0, 200)
+    lastGame: String(p?.lastGame || "Henüz oyun oynanmadı").slice(0, 200)
   };
 }
 
 function cleanPlayers(players) {
   const result = {};
-
-  if (!players || typeof players !== "object") {
-    return result;
-  }
-
+  if (!players || typeof players !== "object") return result;
   for (const [key, value] of Object.entries(players)) {
     const player = cleanPlayer(value);
-
-    if (player.name) {
-      result[player.name] = player;
-    }
+    if (player.name) result[player.name] = player;
   }
-
   return result;
 }
 
@@ -48,16 +38,13 @@ function sortPlayers(players) {
     (a, b) =>
       b.points - a.points ||
       b.correct - a.correct ||
-      a.name.localeCompare(b.name, "tr", {
-        sensitivity: "base"
-      })
+      a.name.localeCompare(b.name, "tr", { sensitivity: "base" })
   );
 }
 
 function mergePlayer(oldPlayer, newPlayer) {
   const oldP = cleanPlayer(oldPlayer);
   const newP = cleanPlayer(newPlayer);
-
   return {
     name: newP.name || oldP.name,
     points: Math.max(oldP.points, newP.points),
@@ -66,88 +53,47 @@ function mergePlayer(oldPlayer, newPlayer) {
     games: Math.max(oldP.games, newP.games),
     bestCombo: Math.max(oldP.bestCombo, newP.bestCombo),
     combo: newP.combo,
-    quickCorrect: Math.max(
-      oldP.quickCorrect,
-      newP.quickCorrect
-    ),
-    radicalCorrect: Math.max(
-      oldP.radicalCorrect,
-      newP.radicalCorrect
-    ),
-    exponentCorrect: Math.max(
-      oldP.exponentCorrect,
-      newP.exponentCorrect
-    ),
+    quickCorrect: Math.max(oldP.quickCorrect, newP.quickCorrect),
+    radicalCorrect: Math.max(oldP.radicalCorrect, newP.radicalCorrect),
+    exponentCorrect: Math.max(oldP.exponentCorrect, newP.exponentCorrect),
     lastGame: newP.lastGame || oldP.lastGame
   };
 }
 
 async function playersApi(request, env) {
   if (!env.KOKUS_DATA) {
-    return json(
-      {
-        ok: false,
-        error: "KOKUS_DATA KV bağlantısı bulunamadı."
-      },
-      500
-    );
+    return json({ ok: false, error: "KOKUS_DATA KV bağlantısı bulunamadı." }, 500);
   }
 
   if (request.method === "GET") {
     let players = {};
-
     try {
       const raw = await env.KOKUS_DATA.get("players");
-
       if (raw) {
         const parsed = JSON.parse(raw);
-        players = cleanPlayers(
-          parsed.players || parsed
-        );
+        players = cleanPlayers(parsed.players || parsed);
       }
     } catch {}
-
-    return json({
-      ok: true,
-      players,
-      ranking: sortPlayers(players)
-    });
+    return json({ ok: true, players, ranking: sortPlayers(players) });
   }
 
   if (request.method !== "PUT") {
-    return json(
-      {
-        ok: false,
-        error: "Yöntem desteklenmiyor."
-      },
-      405
-    );
+    return json({ ok: false, error: "Yöntem desteklenmiyor." }, 405);
   }
 
   let body;
-
   try {
     body = await request.json();
   } catch {
-    return json(
-      {
-        ok: false,
-        error: "Geçersiz JSON."
-      },
-      400
-    );
+    return json({ ok: false, error: "Geçersiz JSON." }, 400);
   }
 
   let existing = {};
-
   try {
     const raw = await env.KOKUS_DATA.get("players");
-
     if (raw) {
       const parsed = JSON.parse(raw);
-      existing = cleanPlayers(
-        parsed.players || parsed
-      );
+      existing = cleanPlayers(parsed.players || parsed);
     }
   } catch {}
 
@@ -155,16 +101,10 @@ async function playersApi(request, env) {
 
   for (const [name, player] of Object.entries(incoming)) {
     const existingName = Object.keys(existing).find(
-      key =>
-        key.toLocaleLowerCase("tr-TR") ===
-        name.toLocaleLowerCase("tr-TR")
+      key => key.toLocaleLowerCase("tr-TR") === name.toLocaleLowerCase("tr-TR")
     );
-
     if (existingName) {
-      existing[existingName] = mergePlayer(
-        existing[existingName],
-        player
-      );
+      existing[existingName] = mergePlayer(existing[existingName], player);
     } else {
       existing[name] = player;
     }
@@ -174,17 +114,10 @@ async function playersApi(request, env) {
 
   await env.KOKUS_DATA.put(
     "players",
-    JSON.stringify({
-      players,
-      updatedAt: new Date().toISOString()
-    })
+    JSON.stringify({ players, updatedAt: new Date().toISOString() })
   );
 
-  return json({
-    ok: true,
-    players,
-    ranking: sortPlayers(players)
-  });
+  return json({ ok: true, players, ranking: sortPlayers(players) });
 }
 
 export default {
@@ -192,21 +125,24 @@ export default {
     const url = new URL(request.url);
 
     try {
-      if (
-        url.pathname === "/api/data/players"
-      ) {
+      if (url.pathname === "/api/data/players") {
         return playersApi(request, env);
+      }
+
+      // English 9 only: math/root asset handling remains unchanged.
+      if (
+        url.pathname === "/english9" ||
+        url.pathname === "/english9/" ||
+        url.pathname === "/english"
+      ) {
+        return env.ASSETS.fetch(
+          new Request(new URL("/english9/index.html", request.url), request)
+        );
       }
 
       return env.ASSETS.fetch(request);
     } catch (error) {
-      return json(
-        {
-          ok: false,
-          error: "Sunucu hatası."
-        },
-        500
-      );
+      return json({ ok: false, error: "Sunucu hatası." }, 500);
     }
   }
 };
