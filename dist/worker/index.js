@@ -198,20 +198,6 @@ export default {
         return playersApi(request, env);
       }
 
-      if (
-        url.pathname === "/english" ||
-        url.pathname === "/english/" ||
-        url.pathname === "/english9" ||
-        url.pathname === "/english9/"
-      ) {
-        return env.ASSETS.fetch(
-          new Request(
-            new URL("/english9/index.html", request.url),
-            request
-          )
-        );
-      }
-
       return env.ASSETS.fetch(request);
     } catch (error) {
       return json(
