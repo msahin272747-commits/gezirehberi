@@ -5,60 +5,102 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>KÖK & ÜS | Proje Araştırması</title>
 <style>
-body{margin:0;background:#07122d;color:#eef7ff;font-family:Arial,sans-serif;line-height:1.65}
-main{max-width:950px;margin:auto;padding:35px 20px}
-.card{background:#0d2046;border:1px solid #2d5b91;border-radius:18px;padding:24px;margin:18px 0}
-h1,h2{color:#8ed9ff}a{color:#8ed9ff}li{margin:7px 0}.back{display:inline-block;margin-bottom:15px}
-.badge{display:inline-block;padding:6px 10px;border:1px solid #4b8bc5;border-radius:20px;color:#bde7ff;font-size:13px}
+:root{--bg:#050c22;--panel:#0c1b42dd;--line:#79b8ff33;--blue:#44b5ff;--text:#eff7ff;--muted:#9bb3d5}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 15% 0,#164e91 0,transparent 30%),radial-gradient(circle at 90% 20%,#092f75 0,transparent 25%),var(--bg);color:var(--text);font-family:Arial,sans-serif;line-height:1.65}
+body:before{content:'√  x²  π  ∑  aⁿ';position:fixed;inset:0;pointer-events:none;opacity:.045;font-weight:800;font-size:14vw;word-spacing:9vw;overflow:hidden;color:#a6e3ff;z-index:-1}
+.shell{max-width:1240px;margin:auto;padding:0 24px}
+.top{position:sticky;top:12px;z-index:5;margin:12px auto;max-width:1290px;padding:12px 18px;background:linear-gradient(135deg,#17376f9e,#0a1535c9);border:1px solid var(--line);box-shadow:0 20px 55px #0005,inset 0 1px #fff1;border-radius:20px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:15px}
+.school-lockup{grid-column:2;grid-row:1;justify-self:center}.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.8px;text-align:center}.logo{width:42px;height:42px;border-radius:13px;background:#eaf7ff;color:#0750a5;display:grid;place-items:center;font-size:18px;font-weight:800;box-shadow:0 0 24px #42b9ff}.brand span{font-size:14px}.brand small{display:block;color:#a7d9ff;font-size:10px;margin-top:3px;letter-spacing:1px}
+.header-actions{grid-column:3;grid-row:1;justify-self:end}.home{border:1px solid #61c4ff55;background:#0a2048;color:#dff3ff;padding:10px 14px;border-radius:10px;font-weight:800;text-decoration:none}
+.nav{grid-column:1/-1;display:flex;justify-content:center;gap:18px;flex-wrap:wrap;border-top:1px solid #73b9f425;padding-top:10px}.nav a{color:var(--muted);text-decoration:none;font-size:12px;font-weight:700}.nav a:hover{color:#fff}
+main{max-width:1000px;margin:auto;padding:55px 24px 30px}.eyebrow{font-size:12px;letter-spacing:1.5px;font-weight:800;color:#94d8ff}.hero{text-align:center;margin-bottom:30px}.hero h1{font-size:clamp(38px,6vw,66px);line-height:1;margin:12px 0;background:linear-gradient(135deg,#fff,#8cd7ff);color:transparent;background-clip:text}.hero p{color:var(--muted);max-width:700px;margin:0 auto}.card{background:linear-gradient(135deg,#17376f9e,#0a1535c9);border:1px solid var(--line);box-shadow:0 20px 45px #0004,inset 0 1px #fff1;border-radius:20px;padding:25px;margin:18px 0}.card h2{margin-top:0;color:#8ed9ff}.card p,.card li{color:#cfe5fa}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.tag{font-size:11px;letter-spacing:1.3px;font-weight:800;color:#94d8ff}.badge{display:inline-block;padding:6px 11px;border:1px solid #4b8bc5;border-radius:20px;color:#bde7ff;font-size:12px;margin-top:12px}
+a{color:#8ed9ff}footer{padding:35px 0;margin-top:35px;background:#030817;border-top:1px solid #68c3ff24;color:var(--muted)}footer b{color:#fff}
+@media(max-width:800px){.top{grid-template-columns:1fr auto}.school-lockup{grid-column:1;justify-self:start}.header-actions{grid-column:2}.brand{text-align:left}.brand span{font-size:10px}.brand small{font-size:8px}.logo{width:34px;height:34px}.nav{grid-row:2;justify-content:flex-start;overflow:auto;flex-wrap:nowrap}.grid{grid-template-columns:1fr}main{padding-top:35px}}
 </style>
 </head>
 <body>
+<header class="top">
+<div class="school-lockup">
+<div class="brand">
+<div class="logo">AK</div>
+<span>ABDULKADİR KONUKOĞLU<br>ANADOLU LİSESİ<small>YAPIMCI · MUSTAFA ŞAHİN 9/D</small></span>
+</div>
+</div>
+<div class="header-actions"><a class="home" href="/">⌂ Ana Sayfa</a></div>
+<nav class="nav">
+<a href="/">Ana Sayfa</a>
+<a href="/#konular">Üslü İfadeler</a>
+<a href="/#konular">Köklü İfadeler</a>
+<a href="/#oyunlar">Oyunlar</a>
+<a href="/#liderlik">Liderlik Tablosu</a>
+<a href="/research.html">Araştırma Modu</a>
+</nav>
+</header>
+
 <main>
-<a class="back" href="/">← KÖK & ÜS ana sayfasına dön</a>
-<h1>KÖK & ÜS — Proje Araştırması</h1>
-<p><span class="badge">Yapımcı: MUSTAFA ŞAHİN · 9/D · ABDULKADİRKONUKOĞLU</span></p>
+<section class="hero">
+<div class="eyebrow">BİLİMSEL ARAŞTIRMA PROJESİ</div>
+<h1>KÖK & ÜS</h1>
+<p>9. sınıf matematikte uyarlanabilir ve oyunlaştırılmış soru sisteminin öğrenci başarısına etkisini inceleyen proje alanı.</p>
+<span class="badge">YAPIMCI · MUSTAFA ŞAHİN · 9/D · ABDULKADİR KONUKOĞLU ANADOLU LİSESİ</span>
+</section>
 
 <section class="card">
-<h2>Araştırma problemi</h2>
+<div class="tag">ARAŞTIRMA PROBLEMİ</div>
+<h2>Uyarlanabilir sistem başarıyı artırır mı?</h2>
 <p>Öğrencinin önceki performansına göre soru seçen uyarlanabilir ve oyunlaştırılmış sistem, rastgele soru seçimine göre matematik öğrenme başarısını artırır mı?</p>
 </section>
 
+<div class="grid">
 <section class="card">
-<h2>Hipotez</h2>
+<div class="tag">HİPOTEZ</div>
+<h2>Beklenen sonuç</h2>
 <p>Uyarlanabilir soru sistemi kullanan öğrencilerin ön testten son teste kadar gösterdikleri başarı gelişiminin kontrol grubundan daha yüksek olması beklenmektedir. Bu sonuç gerçek verilerle test edilecektir.</p>
 </section>
-
 <section class="card">
-<h2>Nasıl ölçülecek?</h2>
+<div class="tag">ÖLÇÜMLER</div>
+<h2>Hangi veriler?</h2>
 <ul>
 <li>Ön test ve son test başarıları</li>
-<li>Deney ve kontrol grubu karşılaştırması</li>
-<li>Konu bazlı doğru/yanlış oranları</li>
+<li>Deney ve kontrol grubu farkı</li>
+<li>Konu bazlı doğru/yanlış oranı</li>
 <li>Soru zorluğu</li>
 <li>Cevaplama süresi</li>
-<li>Başarı değişimi ve gelişim oranı</li>
+<li>Başarı ve gelişim oranı</li>
 </ul>
 </section>
+</div>
 
 <section class="card">
-<h2>Uyarlanabilir sistem</h2>
+<div class="tag">UYARLANABİLİR ALGORİTMA</div>
+<h2>Sistem nasıl karar veriyor?</h2>
 <p>Sistem öğrencinin üslü ve köklü ifadelerdeki geçmiş performansını takip eder. Başarının düşük olduğu konu ve uygun zorluk seviyelerindeki sorulara daha fazla ağırlık verilebilir. Kontrol grubunda ise rastgele soru seçimi kullanılabilir.</p>
 </section>
 
 <section class="card">
-<h2>Araştırma belgeleri</h2>
+<div class="tag">PROJE BELGELERİ</div>
+<h2>Kaynak ve geliştirme kayıtları</h2>
 <ul>
 <li><a href="KAYNAKLAR.md">KAYNAKLAR.md</a> — kullanılan kaynaklar</li>
-<li><a href="ARASTIRMA_GUNLUGU.md">ARASTIRMA_GUNLUGU.md</a> — gerçek geliştirme günlüğü</li>
+<li><a href="ARASTIRMA_GUNLUGU.md">ARASTIRMA_GUNLUGU.md</a> — geliştirme günlüğü</li>
 <li><a href="PROJE_YONTEMI.md">PROJE_YONTEMI.md</a> — araştırma yöntemi</li>
 <li><a href="research.html">Araştırma Modu</a> — veri toplama arayüzü</li>
 </ul>
 </section>
 
 <section class="card">
-<h2>Önemli not</h2>
+<div class="tag">ETİK VE VERİ GÜVENLİĞİ</div>
+<h2>Gerçek veriyle çalışırken</h2>
 <p>Gerçek öğrenci verisi toplanmadan sonuç yazılmamalıdır. Katılımcılarla çalışma yapılacaksa gerekli gönüllü/onam ve okul/MEB izin süreçleri dikkate alınmalıdır. Araştırmada mümkün olduğunca anonim katılımcı kodları kullanılmalıdır.</p>
 </section>
 </main>
+
+<footer>
+<div class="shell">
+<b>KÖK & ÜS · 9. SINIF MATEMATİK OYUN AKADEMİSİ</b>
+<p>YAPIMCI · MUSTAFA ŞAHİN 9/D · ABDULKADİR KONUKOĞLU ANADOLU LİSESİ</p>
+</div>
+</footer>
 </body>
 </html>
