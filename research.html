@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KÖK & ÜS | TÜBİTAK Araştırma Modu</title>
+<style>
+:root{--bg:#050c22;--panel:#0c1b42e8;--line:#79b8ff33;--blue:#44b5ff;--text:#eff7ff;--muted:#9bb3d5;--good:#5ee6a8;--bad:#ff7c91}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0,#164e91 0,transparent 32%),radial-gradient(circle at 90% 20%,#092f75 0,transparent 28%),var(--bg);color:var(--text);font:15px Arial,sans-serif;line-height:1.55}.wrap{max-width:1050px;margin:auto;padding:28px 18px}.card{background:linear-gradient(135deg,#17376f9e,#0a1535d9);border:1px solid var(--line);border-radius:18px;padding:22px;margin:16px 0;box-shadow:0 18px 50px #0005}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.tag{color:#94d8ff;font-weight:800;font-size:12px;letter-spacing:1.3px}.muted{color:var(--muted)}h1,h2,h3{margin-top:0}button{border:1px solid #57c5ff88;border-radius:11px;padding:11px 15px;color:white;font-weight:800;background:#187edb;cursor:pointer;margin:5px 5px 5px 0}button.alt{background:#0d2049bb}button:disabled{opacity:.45;cursor:not-allowed}input,select{width:100%;background:#061631;border:1px solid #56c0ff55;border-radius:9px;padding:11px;color:white;margin:6px 0 12px}label{display:block;font-weight:700;color:#cfe9ff}.choice{display:block;width:100%;text-align:left;background:#102a57}.choice.selected{border-color:#8edfff;background:#1b4c80}.choice.correct{border-color:var(--good)}.choice.wrong{border-color:var(--bad)}.hidden{display:none}.score{font-size:28px;font-weight:800}.stat{padding:14px;border-radius:12px;background:#061434a8;border:1px solid #56bbff26}.stat b{display:block;font-size:24px}.testbox{max-width:700px;margin:auto}.notice{padding:13px;border-left:3px solid #5fc3ff;background:#0c2147aa;border-radius:0 10px 10px 0}.result{padding:14px;border-radius:10px;background:#07162f}.bar{height:8px;background:#06132c;border-radius:10px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#39a9ff,#8bd7ff)}a{color:#9bdcff}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="tag">KÖK & ÜS • TÜBİTAK 2204-A ARAŞTIRMA MODU</div>
+    <h1>Uyarlanabilir Matematik Öğrenme Deneyi</h1>
+    <p class="muted">Bu sayfa araştırma verisini oyun verisinden ayırmak için tasarlanmıştır. Katılım isteğe bağlıdır. Gerçek öğrencilerle veri toplamaya başlamadan önce gerekli okul/MEB izinleri ve veli onamları tamamlanmalıdır.</p>
+    <div class="notice"><b>Araştırma fikri:</b> Uyarlanabilir soru seçimi, sabit/rastgele soru seçimine göre öğrenme performansını ve çözüm hızını artırıyor mu?</div>
+  </div>
+
+  <section id="setup" class="card">
+    <h2>1. Katılımcı kurulumu</h2>
+    <label>Katılımcı kodu (isim yazma)
+      <input id="pid" readonly>
+    </label>
+    <div class="grid">
+      <div>
+        <label>Grup
+          <select id="group">
+            <option value="adaptive">Deney grubu — uyarlanabilir seçim</option>
+            <option value="control">Kontrol grubu — rastgele seçim</option>
+          </select>
+        </label>
+      </div>
+      <div>
+        <label>Aşama
+          <select id="phase">
+            <option value="pretest">Ön test</option>
+            <option value="adaptive">Uyarlamalı çalışma</option>
+            <option value="posttest">Son test</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <label><input id="consent" type="checkbox" style="width:auto;margin-right:8px"> Araştırmanın amacı, veri toplama süreci ve gönüllülük koşullarını okudum ve katılım koşullarını kabul ediyorum.</label>
+    <button onclick="saveSetup()">Ayarları kaydet</button>
+    <button class="alt" onclick="openMain()">Ana matematik sitesine git</button>
+    <p id="setupStatus" class="muted"></p>
+  </section>
+
+  <section id="test" class="card hidden">
+    <div class="testbox">
+      <div class="tag" id="testTag">ÖN TEST</div>
+      <div class="bar"><i id="progress" style="width:0%"></i></div>
+      <p id="counter" class="muted"></p>
+      <h2 id="q"></h2>
+      <div id="choices"></div>
+      <div id="feedback" class="result hidden"></div>
+      <button id="next" onclick="next()" class="hidden">Sonraki soru →</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>2. Veri özeti</h2>
+    <div class="grid">
+      <div class="stat"><small>Bu cihazdaki olay sayısı</small><b id="localCount">0</b></div>
+      <div class="stat"><small>Katılımcı kodu</small><b id="shownPid">—</b></div>
+    </div>
+    <button onclick="refreshSummary()">Sunucu özetini getir</button>
+    <button class="alt" onclick="downloadLocal()">Cihazdaki ham veriyi CSV indir</button>
+    <div id="summary" class="muted"></div>
+  </section>
+
+  <section class="card">
+    <h2>3. Araştırmacı dışa aktarımı</h2>
+    <p class="muted">Ham merkezi veriyi yalnızca Cloudflare Worker'a <code>RESEARCH_ADMIN_KEY</code> secret'ı tanımlandıktan sonra dışa aktar. Bu anahtarı öğrencilere verme.</p>
+    <input id="adminKey" type="password" placeholder="Araştırma yönetici anahtarı">
+    <button onclick="downloadServer()">Merkezi ham veriyi indir</button>
+    <p id="exportStatus" class="muted"></p>
+  </section>
+
+  <section class="card">
+    <h2>4. Araştırma akışı</h2>
+    <ol>
+      <li>Gerekli izin/onamları tamamla.</li>
+      <li>Ön test → çalışma dönemi → son test uygula.</li>
+      <li>Kontrol ve deney gruplarını mümkün olduğunca benzer oluştur.</li>
+      <li>Doğruluk, çözüm süresi ve öğrenme kazanımını karşılaştır.</li>
+      <li>Sonuçları istatistiksel olarak analiz et; sadece siteyi göstermekle yetinme.</li>
+    </ol>
+    <p><a href="/">← KÖK & ÜS ana sayfasına dön</a></p>
+  </section>
+</div>
+
+<script>
+const PRE=[
+["2³ × 2⁴ = ?","2⁷",["2¹²","4⁷","2¹"],"uslu","orta"],
+["(3²)³ = ?","3⁶",["3⁵","9⁶","3⁹"],"uslu","orta"],
+["10⁻² = ?","0,01",["0,2","0,02","100"],"uslu","orta"],
+["5⁰ + 2³ = ?","9",["8","10","25"],"uslu","orta"],
+["4³ ÷ 4² = ?","4",["16","1","8"],"uslu","orta"],
+["√72 en sade hâliyle?","6√2",["3√8","4√3","2√18"],"koklu","orta"],
+["√45 en sade hâliyle?","3√5",["5√9","9√5","√15"],"koklu","orta"],
+["√27 + √12 = ?","5√3",["3√3","√39","6√3"],"koklu","orta"],
+["√50 − √8 = ?","3√2",["√42","7√2","√2"],"koklu","orta"],
+["√(49/81) = ?","7/9",["49/81","9/7","14/81"],"koklu","orta"]
+];
+const POST=[
+["2⁵ × 2² = ?","2⁷",["2¹⁰","4⁷","2³"],"uslu","orta"],
+["(2³)⁴ = ?","2¹²",["2⁷","2⁸","2¹⁶"],"uslu","orta"],
+["10⁻³ = ?","0,001",["0,01","0,03","1000"],"uslu","orta"],
+["7⁰ + 3² = ?","10",["9","8","16"],"uslu","orta"],
+["5⁴ ÷ 5³ = ?","5",["25","1","125"],"uslu","orta"],
+["√98 en sade hâliyle?","7√2",["14√2","2√49","7√7"],"koklu","orta"],
+["√80 en sade hâliyle?","4√5",["8√5","5√4","2√20"],"koklu","orta"],
+["√48 + √27 = ?","7√3",["5√3","9√3","6√3"],"koklu","orta"],
+["√75 − √12 = ?","3√3",["5√3","2√3","7√3"],"koklu","orta"],
+["√(64/25) = ?","8/5",["4/5","16/25","5/8"],"koklu","orta"]
+];
+let questions=[],i=0,startedAt=0,locked=false,score=0,phase="pretest";
+function uid(){return "P-"+Math.random().toString(36).slice(2,8).toUpperCase()}
+function events(){return JSON.parse(localStorage.getItem("kokus-research-events")||"[]")}
+function setup(){
+  let id=localStorage.getItem("kokus-research-id");if(!id){id=uid();localStorage.setItem("kokus-research-id",id)}
+  document.getElementById("pid").value=id;document.getElementById("shownPid").textContent=id;
+  document.getElementById("group").value=localStorage.getItem("kokus-research-group")||"adaptive";
+  document.getElementById("phase").value=localStorage.getItem("kokus-research-phase")||"pretest";
+  document.getElementById("consent").checked=localStorage.getItem("kokus-research-consent")==="yes";
+  document.getElementById("localCount").textContent=events().length;
+}
+function saveSetup(){
+  if(!document.getElementById("consent").checked){document.getElementById("setupStatus").textContent="Katılım onayı işaretlenmeden araştırma modu başlatılamaz.";return}
+  phase=document.getElementById("phase").value;
+  localStorage.setItem("kokus-research-consent","yes");
+  localStorage.setItem("kokus-research-group",document.getElementById("group").value);
+  localStorage.setItem("kokus-research-phase",phase);
+  document.getElementById("setupStatus").textContent="Ayarlar kaydedildi. Aşama başlatılabilir.";
+  if(phase==="adaptive"){openMain();return}
+  startTest();
+}
+function openMain(){location.href="/"}
+function startTest(){
+  phase=document.getElementById("phase").value;
+  questions=phase==="posttest"?POST:PRE;i=0;score=0;
+  document.getElementById("setup").classList.add("hidden");
+  document.getElementById("test").classList.remove("hidden");
+  document.getElementById("testTag").textContent=phase==="posttest"?"SON TEST":"ÖN TEST";
+  show();
+}
+function shuffleOptions(q){
+  const arr=[q[1],...q[2]].sort(()=>Math.random()-.5);
+  return arr;
+}
+function show(){
+  locked=false;startedAt=performance.now();
+  const q=questions[i];document.getElementById("counter").textContent=(i+1)+" / "+questions.length;
+  document.getElementById("progress").style.width=((i)/questions.length*100)+"%";
+  document.getElementById("q").textContent=q[0];
+  const box=document.getElementById("choices");box.innerHTML="";
+  shuffleOptions(q).forEach(opt=>{const b=document.createElement("button");b.className="choice";b.textContent=opt;b.onclick=()=>answer(b,opt,q);box.appendChild(b)});
+  document.getElementById("feedback").classList.add("hidden");document.getElementById("next").classList.add("hidden");
+}
+function answer(btn,opt,q){
+  if(locked)return;locked=true;
+  const correct=opt===q[1],ms=Math.max(0,Math.round(performance.now()-startedAt));
+  if(correct)score++;
+  document.querySelectorAll(".choice").forEach(b=>{b.disabled=true;if(b.textContent===q[1])b.classList.add("correct")});
+  if(!correct)btn.classList.add("wrong");
+  const rec={participantId:localStorage.getItem("kokus-research-id"),phase,group:localStorage.getItem("kokus-research-group")||"adaptive",questionId:"research-"+phase+"-"+(i+1),topic:q[3],difficulty:q[4],correct,responseTimeMs:ms,timestamp:new Date().toISOString()};
+  const a=events();a.push(rec);localStorage.setItem("kokus-research-events",JSON.stringify(a.slice(-500)));
+  fetch("/api/research/events",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(rec)}).catch(()=>{});
+  document.getElementById("feedback").classList.remove("hidden");
+  document.getElementById("feedback").innerHTML=correct?"✅ Doğru.":"❌ Yanlış. Doğru cevap: <b>"+q[1]+"</b>";
+  document.getElementById("next").classList.remove("hidden");
+  document.getElementById("localCount").textContent=events().length;
+}
+function next(){
+  i++;
+  if(i>=questions.length){
+    document.getElementById("q").textContent="Test tamamlandı.";
+    document.getElementById("choices").innerHTML="";
+    document.getElementById("feedback").innerHTML='<div class="score">'+score+" / "+questions.length+"</div><p>Bu sonuç araştırma verisine kaydedildi.</p>";
+    document.getElementById("feedback").classList.remove("hidden");
+    document.getElementById("next").classList.add("hidden");
+    document.getElementById("progress").style.width="100%";
+    return;
+  }
+  show();
+}
+async function refreshSummary(){
+  const el=document.getElementById("summary");el.textContent="Yükleniyor…";
+  try{const r=await fetch("/api/research/summary",{cache:"no-store"});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||"Hata");
+    el.innerHTML="<p><b>Toplam olay:</b> "+j.eventCount+"<br><b>Anonim katılımcı:</b> "+j.participantCount+"</p>"+Object.entries(j.byPhase||{}).map(([k,v])=>"<p><b>"+k+"</b>: "+v.events+" olay · başarı %"+v.accuracy+" · ort. "+v.avgResponseMs+" ms</p>").join("");
+  }catch(e){el.textContent="Özet alınamadı: "+e.message}
+}
+function downloadLocal(){
+  const rows=events();if(!rows.length){alert("Henüz yerel araştırma verisi yok.");return}
+  const keys=["participantId","phase","group","questionId","topic","difficulty","correct","responseTimeMs","timestamp"];
+  const csv=[keys.join(","),...rows.map(r=>keys.map(k=>JSON.stringify(r[k]??"")).join(","))].join("\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="kokus-arastirma-verileri.csv";a.click();URL.revokeObjectURL(a.href);
+}
+async function downloadServer(){
+  const key=document.getElementById("adminKey").value.trim();if(!key){document.getElementById("exportStatus").textContent="Yönetici anahtarını gir.";return}
+  const r=await fetch("/api/research/export",{headers:{"x-research-key":key},cache:"no-store"});const j=await r.json();
+  if(!r.ok||!j.ok){document.getElementById("exportStatus").textContent=j.error||"Dışa aktarma başarısız.";return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(j.events,null,2)],{type:"application/json"}));a.download="kokus-arastirma-raw.json";a.click();URL.revokeObjectURL(a.href);document.getElementById("exportStatus").textContent=j.events.length+" olay dışa aktarıldı.";
+}
+setup();
+</script>
+</body>
+</html>
