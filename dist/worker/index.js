@@ -136,13 +136,14 @@ export default {
         try { body = await request.json(); } catch { return json({ok:false,error:"Geçersiz JSON."},400); }
         const participantId=String(body?.participantId||"").slice(0,64);
         const phase=String(body?.phase||"adaptive").slice(0,32);
+        const group=String(body?.group||"adaptive").slice(0,32);
         const questionId=String(body?.questionId||"").slice(0,80);
         const topic=String(body?.topic||"").slice(0,32);
         const difficulty=String(body?.difficulty||"").slice(0,32);
         const correct=!!body?.correct;
         const responseTimeMs=Math.min(120000,Math.max(0,Number(body?.responseTimeMs)||0));
         if(!participantId||!questionId||!topic) return json({ok:false,error:"Eksik araştırma verisi."},400);
-        const event={participantId,phase,questionId,topic,difficulty,correct,responseTimeMs,timestamp:new Date().toISOString()};
+        const event={participantId,phase,group,questionId,topic,difficulty,correct,responseTimeMs,timestamp:new Date().toISOString()};
         const id=crypto.randomUUID();
         await env.KOKUS_DATA.put("research:event:"+id,JSON.stringify(event),{expirationTtl:60*60*24*180});
         return json({ok:true,id});
