@@ -1,106 +1,88 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>KÖK & ÜS | Proje Araştırması</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KÖK & ÜS | Matematik Pratiği ve Araştırma</title>
 <style>
-:root{--bg:#050c22;--panel:#0c1b42dd;--line:#79b8ff33;--blue:#44b5ff;--text:#eff7ff;--muted:#9bb3d5}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;background:radial-gradient(circle at 15% 0,#164e91 0,transparent 30%),radial-gradient(circle at 90% 20%,#092f75 0,transparent 25%),var(--bg);color:var(--text);font-family:Arial,sans-serif;line-height:1.65}
-body:before{content:'√  x²  π  ∑  aⁿ';position:fixed;inset:0;pointer-events:none;opacity:.045;font-weight:800;font-size:14vw;word-spacing:9vw;overflow:hidden;color:#a6e3ff;z-index:-1}
-.shell{max-width:1240px;margin:auto;padding:0 24px}
-.top{position:sticky;top:12px;z-index:5;margin:12px auto;max-width:1290px;padding:12px 18px;background:linear-gradient(135deg,#17376f9e,#0a1535c9);border:1px solid var(--line);box-shadow:0 20px 55px #0005,inset 0 1px #fff1;border-radius:20px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:15px}
-.school-lockup{grid-column:2;grid-row:1;justify-self:center}.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.8px;text-align:center}.logo{width:42px;height:42px;border-radius:13px;background:#eaf7ff;color:#0750a5;display:grid;place-items:center;font-size:18px;font-weight:800;box-shadow:0 0 24px #42b9ff}.brand span{font-size:14px}.brand small{display:block;color:#a7d9ff;font-size:10px;margin-top:3px;letter-spacing:1px}
-.header-actions{grid-column:3;grid-row:1;justify-self:end}.home{border:1px solid #61c4ff55;background:#0a2048;color:#dff3ff;padding:10px 14px;border-radius:10px;font-weight:800;text-decoration:none}
-.nav{grid-column:1/-1;display:flex;justify-content:center;gap:18px;flex-wrap:wrap;border-top:1px solid #73b9f425;padding-top:10px}.nav a{color:var(--muted);text-decoration:none;font-size:12px;font-weight:700}.nav a:hover{color:#fff}
-main{max-width:1000px;margin:auto;padding:55px 24px 30px}.eyebrow{font-size:12px;letter-spacing:1.5px;font-weight:800;color:#94d8ff}.hero{text-align:center;margin-bottom:30px}.hero h1{font-size:clamp(38px,6vw,66px);line-height:1;margin:12px 0;background:linear-gradient(135deg,#fff,#8cd7ff);color:transparent;background-clip:text}.hero p{color:var(--muted);max-width:700px;margin:0 auto}.card{background:linear-gradient(135deg,#17376f9e,#0a1535c9);border:1px solid var(--line);box-shadow:0 20px 45px #0004,inset 0 1px #fff1;border-radius:20px;padding:25px;margin:18px 0}.card h2{margin-top:0;color:#8ed9ff}.card p,.card li{color:#cfe5fa}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.tag{font-size:11px;letter-spacing:1.3px;font-weight:800;color:#94d8ff}.badge{display:inline-block;padding:6px 11px;border:1px solid #4b8bc5;border-radius:20px;color:#bde7ff;font-size:12px;margin-top:12px}
-a{color:#8ed9ff}footer{padding:35px 0;margin-top:35px;background:#030817;border-top:1px solid #68c3ff24;color:var(--muted)}footer b{color:#fff}
-@media(max-width:800px){.top{grid-template-columns:1fr auto}.school-lockup{grid-column:1;justify-self:start}.header-actions{grid-column:2}.brand{text-align:left}.brand span{font-size:10px}.brand small{font-size:8px}.logo{width:34px;height:34px}.nav{grid-row:2;justify-content:flex-start;overflow:auto;flex-wrap:nowrap}.grid{grid-template-columns:1fr}main{padding-top:35px}}
+:root{--bg:#050c22;--line:#79b8ff38;--blue:#44b5ff;--text:#eff7ff;--muted:#9bb3d5;--panel:#0c1b42dd}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 15% 0,#164e91 0,transparent 30%),radial-gradient(circle at 90% 20%,#092f75 0,transparent 25%),var(--bg);color:var(--text);font-family:Arial,sans-serif;line-height:1.6}
+.shell{max-width:1240px;margin:auto;padding:0 24px}.top{position:sticky;top:8px;z-index:5;margin:8px auto;max-width:1290px;padding:12px 18px;background:linear-gradient(135deg,#17376fef,#0a1535f2);border:1px solid var(--line);box-shadow:0 20px 55px #0005;border-radius:20px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:15px}
+.school-lockup{grid-column:2;grid-row:1;justify-self:center}.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.8px;text-align:center}.logo{width:42px;height:42px;border-radius:13px;background:#eaf7ff;color:#0750a5;display:grid;place-items:center;font-size:18px;font-weight:800;box-shadow:0 0 24px #42b9ff}.brand span{font-size:14px}.brand small{display:block;color:#a7d9ff;font-size:10px;margin-top:3px;letter-spacing:1px}.header-actions{grid-column:3;grid-row:1;justify-self:end}.home,.btn{display:inline-block;border:1px solid #61c4ff77;background:#137bd2;color:#fff;padding:10px 14px;border-radius:10px;font-weight:800;text-decoration:none;cursor:pointer}.nav{grid-column:1/-1;display:flex;justify-content:center;gap:18px;flex-wrap:wrap;border-top:1px solid #73b9f425;padding-top:10px}.nav a{color:var(--muted);text-decoration:none;font-size:12px;font-weight:700}.nav a:hover{color:white}
+main{max-width:1000px;margin:auto;padding:38px 24px 30px}.hero{text-align:center;padding:22px 0 30px}.eyebrow,.tag{font-size:12px;letter-spacing:1.5px;font-weight:800;color:#94d8ff}.hero h1{font-size:clamp(42px,7vw,72px);line-height:1;margin:14px 0;background:linear-gradient(135deg,#fff,#8cd7ff);color:transparent;background-clip:text}.hero p{color:var(--muted);max-width:700px;margin:auto}.badge{display:inline-block;padding:6px 11px;border:1px solid #4b8bc5;border-radius:20px;color:#bde7ff;font-size:12px;margin-top:12px}
+.card{background:linear-gradient(135deg,#17376fbd,#0a1535e8);border:1px solid var(--line);box-shadow:0 20px 45px #0004,inset 0 1px #fff1;border-radius:20px;padding:24px;margin:18px 0}.card h2{margin:7px 0 12px;color:#8ed9ff}.card p,.card li{color:#cfe5fa}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.quiz-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.filters{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.filters button,.answer{border:1px solid #65bfff55;background:#0a1c40;color:#eaf7ff;border-radius:12px;padding:12px 15px;font-weight:700;cursor:pointer}.filters button.active{background:#187edb;border-color:#9be0ff}.meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}.meter{height:8px;border-radius:9px;background:#06132c;overflow:hidden;margin:15px 0}.meter span{display:block;height:100%;width:0;background:linear-gradient(90deg,#39a9ff,#8bd7ff);transition:width .2s}.question{font-size:clamp(20px,3vw,27px);font-weight:800;margin:18px 0}.answers{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.answer{text-align:left;min-height:54px}.answer:hover:not(:disabled){background:#173e74}.answer:disabled{cursor:default;opacity:.94}.answer.correct{border-color:#39d98a;background:#0d503c}.answer.wrong{border-color:#ff7777;background:#5a2030}.feedback{display:none;padding:13px;border-radius:12px;background:#07152f;margin-top:14px}.feedback.show{display:block}.quiz-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap}.score{font-weight:800;color:#9cddff}.notice{padding:14px;border-left:3px solid #5fc3ff;background:#0c2147aa;border-radius:0 12px 12px 0;color:#cde6ff}.doc-list li{margin:8px 0}footer{padding:35px 0;margin-top:35px;background:#030817;border-top:1px solid #68c3ff24;color:var(--muted)}footer b{color:#fff}
+@media(max-width:800px){.top{grid-template-columns:1fr auto}.school-lockup{grid-column:1;justify-self:start}.header-actions{grid-column:2}.brand{text-align:left}.brand span{font-size:10px}.brand small{font-size:8px}.logo{width:34px;height:34px}.nav{grid-row:2;justify-content:flex-start;overflow:auto;flex-wrap:nowrap}.grid,.answers{grid-template-columns:1fr}main{padding-top:22px}.card{padding:18px}}
 </style>
 </head>
 <body>
 <header class="top">
-<div class="school-lockup">
-<div class="brand">
-<div class="logo">AK</div>
-<span>ABDULKADİR KONUKOĞLU<br>ANADOLU LİSESİ<small>YAPIMCI · MUSTAFA ŞAHİN 9/D</small></span>
-</div>
-</div>
+<div class="school-lockup"><div class="brand"><div class="logo">AK</div><span>ABDULKADİR KONUKOĞLU<br>ANADOLU LİSESİ<small>YAPIMCI · MUSTAFA ŞAHİN 9/D</small></span></div></div>
 <div class="header-actions"><a class="home" href="/">⌂ Ana Sayfa</a></div>
-<nav class="nav">
-<a href="/">Ana Sayfa</a>
-<a href="/#konular">Üslü İfadeler</a>
-<a href="/#konular">Köklü İfadeler</a>
-<a href="/#oyunlar">Oyunlar</a>
-<a href="/#liderlik">Liderlik Tablosu</a>
-<a href="/research.html">Araştırma Modu</a>
-</nav>
+<nav class="nav"><a href="/">Ana Sayfa</a><a href="#quiz">Soru Çöz</a><a href="#uslu">Üslü İfadeler</a><a href="#koklu">Köklü İfadeler</a><a href="#arastirma">Araştırma</a><a href="/research.html">Araştırma Modu</a></nav>
 </header>
-
 <main>
-<section class="hero">
-<div class="eyebrow">BİLİMSEL ARAŞTIRMA PROJESİ</div>
-<h1>KÖK & ÜS</h1>
-<p>9. sınıf matematikte uyarlanabilir ve oyunlaştırılmış soru sisteminin öğrenci başarısına etkisini inceleyen proje alanı.</p>
-<span class="badge">YAPIMCI · MUSTAFA ŞAHİN · 9/D · ABDULKADİR KONUKOĞLU ANADOLU LİSESİ</span>
-</section>
+<section class="hero"><div class="eyebrow">9. SINIF · MATEMATİK PRATİĞİ</div><h1>KÖK & ÜS</h1><p>Konunu seç, soruyu çöz, açıklamayı incele ve ilerlemeni takip et.</p><span class="badge">YAPIMCI · MUSTAFA ŞAHİN · 9/D · ABDULKADİR KONUKOĞLU ANADOLU LİSESİ</span></section>
 
-<section class="card">
-<div class="tag">ARAŞTIRMA PROBLEMİ</div>
-<h2>Uyarlanabilir sistem başarıyı artırır mı?</h2>
-<p>Öğrencinin önceki performansına göre soru seçen uyarlanabilir ve oyunlaştırılmış sistem, rastgele soru seçimine göre matematik öğrenme başarısını artırır mı?</p>
+<section id="quiz" class="card">
+<div class="quiz-head"><div><div class="tag">ETKİLEŞİMLİ SORU ALANI</div><h2>Hadi matematik çözelim!</h2></div><div class="score">Puan: <span id="score">0</span></div></div>
+<p>Her soru için bir cevap seç. Cevabını kontrol ettikten sonra kısa açıklamayı görebilir ve sonraki soruya geçebilirsin.</p>
+<div class="filters" role="group" aria-label="Konu seç">
+<button class="active" data-topic="all">Karışık</button><button data-topic="uslu">Üslü ifadeler</button><button data-topic="koklu">Köklü ifadeler</button>
+</div>
+<div class="meta"><span id="counter">Soru 1</span><span id="topicLabel">Karışık konu</span><span id="streak">Seri: 0</span></div>
+<div class="meter"><span id="progress"></span></div>
+<div id="question" class="question">Soru yükleniyor…</div>
+<div id="answers" class="answers"></div>
+<div id="feedback" class="feedback" aria-live="polite"></div>
+<div class="quiz-actions"><span class="muted" id="hint">Bir cevap seçerek başla.</span><button id="next" class="btn" disabled>Sonraki soru →</button></div>
 </section>
 
 <div class="grid">
-<section class="card">
-<div class="tag">HİPOTEZ</div>
-<h2>Beklenen sonuç</h2>
-<p>Uyarlanabilir soru sistemi kullanan öğrencilerin ön testten son teste kadar gösterdikleri başarı gelişiminin kontrol grubundan daha yüksek olması beklenmektedir. Bu sonuç gerçek verilerle test edilecektir.</p>
-</section>
-<section class="card">
-<div class="tag">ÖLÇÜMLER</div>
-<h2>Hangi veriler?</h2>
-<ul>
-<li>Ön test ve son test başarıları</li>
-<li>Deney ve kontrol grubu farkı</li>
-<li>Konu bazlı doğru/yanlış oranı</li>
-<li>Soru zorluğu</li>
-<li>Cevaplama süresi</li>
-<li>Başarı ve gelişim oranı</li>
-</ul>
-</section>
+<section id="uslu" class="card"><div class="tag">KONU HATIRLATMA</div><h2>Üslü ifadeler</h2><ul><li>Aynı tabanlı kuvvetler çarpılırken üsler toplanır: aᵐ · aⁿ = aᵐ⁺ⁿ.</li><li>Aynı tabanlı kuvvetler bölünürken üsler çıkarılır: aᵐ / aⁿ = aᵐ⁻ⁿ (a ≠ 0).</li><li>Kuvvetin kuvveti alınırken üsler çarpılır: (aᵐ)ⁿ = aᵐⁿ.</li><li>Sıfırdan farklı a için a⁰ = 1; a⁻ⁿ = 1/aⁿ.</li></ul></section>
+<section id="koklu" class="card"><div class="tag">KONU HATIRLATMA</div><h2>Köklü ifadeler</h2><ul><li>√(a·b) = √a · √b (a ve b negatif olmayan sayılarken).</li><li>Tam kare çarpanları kök dışına çıkar: √72 = √(36·2) = 6√2.</li><li>Benzer köklü ifadeler toplanıp çıkarılabilir: 2√3 + 3√3 = 5√3.</li><li>Karekökün temel anlamı, karesi verilen sayıya eşit olan negatif olmayan sayıdır.</li></ul></section>
 </div>
 
-<section class="card">
-<div class="tag">UYARLANABİLİR ALGORİTMA</div>
-<h2>Sistem nasıl karar veriyor?</h2>
-<p>Sistem öğrencinin üslü ve köklü ifadelerdeki geçmiş performansını takip eder. Başarının düşük olduğu konu ve uygun zorluk seviyelerindeki sorulara daha fazla ağırlık verilebilir. Kontrol grubunda ise rastgele soru seçimi kullanılabilir.</p>
-</section>
+<section id="arastirma" class="card"><div class="tag">BİLİMSEL ARAŞTIRMA PROJESİ</div><h2>Araştırma sorusu</h2><p>Öğrencinin önceki performansına göre soru seçen uyarlanabilir ve oyunlaştırılmış sistem, rastgele soru seçimine göre matematik öğrenme başarısını artırır mı?</p><div class="notice">Bu sayfadaki pratik puanı yalnızca bu sayfa için tutulur ve ana sitenin liderlik tablosuna gönderilmez. Araştırma sonuçları gerçek veriler toplandıktan sonra değerlendirilmelidir.</div></section>
 
-<section class="card">
-<div class="tag">PROJE BELGELERİ</div>
-<h2>Kaynak ve geliştirme kayıtları</h2>
-<ul>
-<li><a href="KAYNAKLAR.md">KAYNAKLAR.md</a> — kullanılan kaynaklar</li>
-<li><a href="ARASTIRMA_GUNLUGU.md">ARASTIRMA_GUNLUGU.md</a> — geliştirme günlüğü</li>
-<li><a href="PROJE_YONTEMI.md">PROJE_YONTEMI.md</a> — araştırma yöntemi</li>
-<li><a href="research.html">Araştırma Modu</a> — veri toplama arayüzü</li>
-</ul>
-</section>
-
-<section class="card">
-<div class="tag">ETİK VE VERİ GÜVENLİĞİ</div>
-<h2>Gerçek veriyle çalışırken</h2>
-<p>Gerçek öğrenci verisi toplanmadan sonuç yazılmamalıdır. Katılımcılarla çalışma yapılacaksa gerekli gönüllü/onam ve okul/MEB izin süreçleri dikkate alınmalıdır. Araştırmada mümkün olduğunca anonim katılımcı kodları kullanılmalıdır.</p>
-</section>
+<section class="card"><div class="tag">PROJE BELGELERİ</div><h2>Kaynaklar ve yöntem</h2><ul class="doc-list"><li><a href="KAYNAKLAR.md">KAYNAKLAR.md</a> — başvurulan teknik ve yarışma kaynakları</li><li><a href="ARASTIRMA_GUNLUGU.md">ARASTIRMA_GUNLUGU.md</a> — geliştirme günlüğü</li><li><a href="PROJE_YONTEMI.md">PROJE_YONTEMI.md</a> — araştırma yöntemi</li><li><a href="/research.html">Araştırma Modu</a> — ön test, uygulama ve son test arayüzü</li></ul><p>Gerçek öğrencilerden veri toplanmadan önce gerekli veli/onam ve okul/MEB izin süreçlerini kontrol et.</p></section>
 </main>
-
-<footer>
-<div class="shell">
-<b>KÖK & ÜS · 9. SINIF MATEMATİK OYUN AKADEMİSİ</b>
-<p>YAPIMCI · MUSTAFA ŞAHİN 9/D · ABDULKADİR KONUKOĞLU ANADOLU LİSESİ</p>
-</div>
-</footer>
+<footer><div class="shell"><b>KÖK & ÜS · 9. SINIF MATEMATİK OYUN AKADEMİSİ</b><p>YAPIMCI · MUSTAFA ŞAHİN 9/D · ABDULKADİR KONUKOĞLU ANADOLU LİSESİ</p></div></footer>
+<script>
+const questions=[
+{topic:'uslu',q:'2³ × 2⁴ işleminin sonucu nedir?',a:['2⁷','2¹²','4⁷','2¹'],correct:0,why:'Aynı tabanlı kuvvetler çarpılırken üsler toplanır: 3 + 4 = 7. Sonuç 2⁷.'},
+{topic:'uslu',q:'(3²)³ işleminin sonucu nedir?',a:['3⁵','3⁶','9⁶','3⁹'],correct:1,why:'Kuvvetin kuvvetinde üsler çarpılır: 2 × 3 = 6. Sonuç 3⁶.'},
+{topic:'uslu',q:'5⁰ + 2³ işleminin sonucu nedir?',a:['8','9','10','25'],correct:1,why:'5⁰ = 1 ve 2³ = 8. Toplam 1 + 8 = 9.'},
+{topic:'uslu',q:'10⁻² sayısının ondalık gösterimi hangisidir?',a:['0,1','0,01','0,2','100'],correct:1,why:'10⁻² = 1/10² = 1/100 = 0,01.'},
+{topic:'uslu',q:'4³ ÷ 4² işleminin sonucu nedir?',a:['4','16','1','8'],correct:0,why:'Aynı tabanlı kuvvetler bölünürken üsler çıkarılır: 4³ / 4² = 4¹ = 4.'},
+{topic:'uslu',q:'(-2)⁴ işleminin sonucu nedir?',a:['-16','16','-8','8'],correct:1,why:'Çift kuvvette negatif tabanın sonucu pozitiftir: (-2)×(-2)×(-2)×(-2) = 16.'},
+{topic:'uslu',q:'2⁵ · 4² işlemi 2 tabanında nasıl yazılır?',a:['2⁷','2⁹','2¹⁰','4⁷'],correct:1,why:'4² = (2²)² = 2⁴. Sonra 2⁵ · 2⁴ = 2⁹.'},
+{topic:'uslu',q:'3⁻² ifadesinin değeri nedir?',a:['-9','1/6','1/9','9'],correct:2,why:'Negatif üs, sayının çarpmaya göre tersini verir: 3⁻² = 1/3² = 1/9.'},
+{topic:'uslu',q:'(2·5)² işleminin sonucu nedir?',a:['20','50','100','25'],correct:2,why:'Önce 2·5 = 10. 10² = 100.'},
+{topic:'uslu',q:'a⁴ · a² ifadesinin sadeleşmiş hâli nedir?',a:['a⁸','a⁶','a²','2a⁶'],correct:1,why:'Aynı tabanlı kuvvetlerde üsler toplanır: a⁴ · a² = a⁶.'},
+{topic:'koklu',q:'√72 en sade hâliyle nedir?',a:['6√2','3√8','4√3','2√18'],correct:0,why:'72 = 36·2 olduğundan √72 = √36·√2 = 6√2.'},
+{topic:'koklu',q:'√45 en sade hâliyle nedir?',a:['5√3','3√5','9√5','√15'],correct:1,why:'45 = 9·5 olduğundan √45 = 3√5.'},
+{topic:'koklu',q:'√27 + √12 işleminin sonucu nedir?',a:['3√3','5√3','√39','6√3'],correct:1,why:'√27 = 3√3 ve √12 = 2√3. Toplam 5√3.'},
+{topic:'koklu',q:'√50 − √8 işleminin sonucu nedir?',a:['3√2','7√2','√42','√2'],correct:0,why:'√50 = 5√2 ve √8 = 2√2. Fark 3√2.'},
+{topic:'koklu',q:'√(49/81) işleminin sonucu nedir?',a:['49/81','9/7','7/9','14/81'],correct:2,why:'√49 / √81 = 7/9.'},
+{topic:'koklu',q:'√18 · √2 işleminin sonucu nedir?',a:['3','6','√20','36'],correct:1,why:'√18 · √2 = √36 = 6.'},
+{topic:'koklu',q:'√75 / √3 işleminin sonucu nedir?',a:['5','25','√72','√25'],correct:0,why:'√75 / √3 = √(75/3) = √25 = 5.'},
+{topic:'koklu',q:'√0,49 işleminin sonucu nedir?',a:['0,49','0,07','0,7','7'],correct:2,why:'0,7 × 0,7 = 0,49; bu nedenle √0,49 = 0,7.'},
+{topic:'koklu',q:'√108 en sade hâliyle nedir?',a:['3√12','6√3','9√3','√36'],correct:1,why:'108 = 36·3 olduğundan √108 = 6√3.'},
+{topic:'koklu',q:'(3√5)² işleminin sonucu nedir?',a:['15','45','9√5','30'],correct:1,why:'(3√5)² = 3² · (√5)² = 9·5 = 45.'}
+];
+let topic='all',pool=[],index=0,score=0,streak=0,answered=false,correctCount=0;
+const $=id=>document.getElementById(id);
+function shuffle(items){const arr=[...items];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+function begin(){pool=shuffle(questions.filter(q=>topic==='all'||q.topic===topic));index=0;score=0;streak=0;correctCount=0;showQuestion()}
+function showQuestion(){answered=false;const q=pool[index];if(!q){finish();return}
+$('counter').textContent='Soru '+(index+1)+' / '+pool.length;$('topicLabel').textContent=q.topic==='uslu'?'Üslü ifadeler':'Köklü ifadeler';$('streak').textContent='Seri: '+streak;$('score').textContent=score;$('progress').style.width=(index/pool.length*100)+'%';$('question').textContent=q.q;$('hint').textContent='Bir cevap seç.';$('feedback').className='feedback';$('feedback').textContent='';$('next').disabled=true;$('next').textContent=index===pool.length-1?'Sonuçları gör →':'Sonraki soru →';
+const box=$('answers');box.innerHTML='';q.a.forEach((answer,i)=>{const b=document.createElement('button');b.className='answer';b.textContent=String.fromCharCode(65+i)+') '+answer;b.addEventListener('click',()=>checkAnswer(i));box.appendChild(b)})}
+function checkAnswer(choice){if(answered)return;answered=true;const q=pool[index],buttons=[...$('answers').querySelectorAll('button')],ok=choice===q.correct;if(ok){score+=10;streak++;correctCount++}else streak=0;buttons.forEach((b,i)=>{b.disabled=true;if(i===q.correct)b.classList.add('correct');if(i===choice&&!ok)b.classList.add('wrong')});$('score').textContent=score;$('streak').textContent='Seri: '+streak;$('progress').style.width=((index+1)/pool.length*100)+'%';$('feedback').className='feedback show';$('feedback').innerHTML=(ok?'✅ <b>Doğru cevap!</b> +10 puan.':'❌ <b>Bu cevap doğru değil.</b>')+'<br>'+q.why;$('hint').textContent=ok?'Harika, devam et!':'Açıklamayı incele ve sonraki soruda tekrar dene.';$('next').disabled=false}
+function nextQuestion(){if(!answered)return;index++;showQuestion()}
+function finish(){$('counter').textContent='Tur tamamlandı';$('topicLabel').textContent='Sonuç';$('streak').textContent='Doğru: '+correctCount+' / '+pool.length;$('progress').style.width='100%';$('question').textContent='Tebrikler! Tur bitti 🎉';$('answers').innerHTML='<p>Başarı oranı: %'+Math.round(correctCount/pool.length*100)+'</p><p>Toplam puan: '+score+'</p>'; $('feedback').className='feedback show';$('feedback').textContent='Yeni tur başlatmak için aşağıdaki düğmeye bas.';$('hint').textContent='';$('next').disabled=false;$('next').textContent='Yeniden başla ↻';$('next').onclick=()=>begin()}
+document.querySelectorAll('[data-topic]').forEach(b=>b.addEventListener('click',()=>{topic=b.dataset.topic;document.querySelectorAll('[data-topic]').forEach(x=>x.classList.toggle('active',x===b));$('next').onclick=nextQuestion;begin();$('quiz').scrollIntoView({behavior:'smooth',block:'start'})}));
+$('next').addEventListener('click',nextQuestion);
+begin();
+</script>
 </body>
 </html>
