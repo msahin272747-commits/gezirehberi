@@ -40,7 +40,7 @@ function selectQuestion(topic,mode='normal',reward=false){
   const slots=['A','B','C','D'].filter(x=>x!==game.correctSlots.at(-1));
   const balanced=pool.filter(q=>slots.includes(q.correctAnswer));
   if(balanced.length)pool=balanced;
-  if(!user||reward||mode==='boss'||!pool.length)return pool[Math.floor(Math.random()*pool.length)]||null;
+  const researchGroup=localStorage.getItem('kokus-research-group')||'';if(!user||reward||mode==='boss'||researchGroup==='control'||!pool.length)return pool[Math.floor(Math.random()*pool.length)]||null;
   const stats=user.topicStats||{};
   const topicPool=pool.map(q=>{
     const s=stats[q.topic]||{correct:0,wrong:0};
@@ -72,8 +72,9 @@ async function logResearchEvent(event){
     if(!consent)return;
     const participantId=localStorage.getItem('kokus-research-id');
     const phase=localStorage.getItem('kokus-research-phase')||'adaptive';
+    const group=localStorage.getItem('kokus-research-group')||'adaptive';
     if(!participantId)return;
-    const record={participantId,phase,questionId:event.questionId,topic:event.topic,difficulty:event.difficulty,correct:!!event.correct,responseTimeMs:Number(event.responseTimeMs)||0,timestamp:new Date().toISOString()};
+    const record={participantId,phase,group,questionId:event.questionId,topic:event.topic,difficulty:event.difficulty,correct:!!event.correct,responseTimeMs:Number(event.responseTimeMs)||0,timestamp:new Date().toISOString()};
     const local=JSON.parse(localStorage.getItem('kokus-research-events')||'[]');
     local.push(record);
     localStorage.setItem('kokus-research-events',JSON.stringify(local.slice(-500)));
