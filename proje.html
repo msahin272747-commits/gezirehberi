@@ -12,16 +12,32 @@ main{max-width:1000px;margin:auto;padding:38px 24px 30px}.hero{text-align:center
 .card{background:linear-gradient(135deg,#17376fbd,#0a1535e8);border:1px solid var(--line);box-shadow:0 20px 45px #0004,inset 0 1px #fff1;border-radius:20px;padding:24px;margin:18px 0}.card h2{margin:7px 0 12px;color:#8ed9ff}.card p,.card li{color:#cfe5fa}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
 .quiz-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.filters{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.filters button,.answer{border:1px solid #65bfff55;background:#0a1c40;color:#eaf7ff;border-radius:12px;padding:12px 15px;font-weight:700;cursor:pointer}.filters button.active{background:#187edb;border-color:#9be0ff}.meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}.meter{height:8px;border-radius:9px;background:#06132c;overflow:hidden;margin:15px 0}.meter span{display:block;height:100%;width:0;background:linear-gradient(90deg,#39a9ff,#8bd7ff);transition:width .2s}.question{font-size:clamp(20px,3vw,27px);font-weight:800;margin:18px 0}.answers{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.answer{text-align:left;min-height:54px}.answer:hover:not(:disabled){background:#173e74}.answer:disabled{cursor:default;opacity:.94}.answer.correct{border-color:#39d98a;background:#0d503c}.answer.wrong{border-color:#ff7777;background:#5a2030}.feedback{display:none;padding:13px;border-radius:12px;background:#07152f;margin-top:14px}.feedback.show{display:block}.quiz-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap}.score{font-weight:800;color:#9cddff}.notice{padding:14px;border-left:3px solid #5fc3ff;background:#0c2147aa;border-radius:0 12px 12px 0;color:#cde6ff}.doc-list li{margin:8px 0}footer{padding:35px 0;margin-top:35px;background:#030817;border-top:1px solid #68c3ff24;color:var(--muted)}footer b{color:#fff}
 @media(max-width:800px){.top{grid-template-columns:1fr auto}.school-lockup{grid-column:1;justify-self:start}.header-actions{grid-column:2}.brand{text-align:left}.brand span{font-size:10px}.brand small{font-size:8px}.logo{width:34px;height:34px}.nav{grid-row:2;justify-content:flex-start;overflow:auto;flex-wrap:nowrap}.grid,.answers{grid-template-columns:1fr}main{padding-top:22px}.card{padding:18px}}
-</style>
+.level-box{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}.level-result{min-width:190px;text-align:center;padding:18px;border:1px solid #65bfff44;border-radius:16px;background:#061735}.level-name{font-size:28px;font-weight:900;color:#8ed9ff}.level-score{color:#cfe5fa;font-size:13px}.level-question{font-size:20px;font-weight:800;margin:15px 0}.level-answers{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.level-answers button{border:1px solid #65bfff55;background:#0a1c40;color:#eaf7ff;border-radius:10px;padding:11px;text-align:left;cursor:pointer}.level-answers button:hover{background:#173e74}.level-answers button:disabled{cursor:default}.level-answers .good{background:#0d503c;border-color:#39d98a}.level-answers .bad{background:#5a2030;border-color:#ff7777}.level-progress{height:7px;background:#06132c;border-radius:9px;overflow:hidden}.level-progress span{display:block;height:100%;width:0;background:#44b5ff;transition:.2s}.level-actions{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}.level-actions button{border:1px solid #61c4ff77;background:#137bd2;color:#fff;padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer}.level-note{color:#9bb3d5;font-size:13px}@media(max-width:800px){.level-box{grid-template-columns:1fr}.level-result{min-width:0}.level-answers{grid-template-columns:1fr}}</style>
 </head>
 <body>
 <header class="top">
 <div class="school-lockup"><div class="brand"><div class="logo">AK</div><span>ABDULKADİR KONUKOĞLU<br>ANADOLU LİSESİ<small>YAPIMCI · MUSTAFA ŞAHİN 9/D</small></span></div></div>
 <div class="header-actions"><a class="home" href="/">⌂ Ana Sayfa</a></div>
-<nav class="nav"><a href="/">Ana Sayfa</a><a href="#quiz">Soru Çöz</a><a href="#uslu">Üslü İfadeler</a><a href="#koklu">Köklü İfadeler</a><a href="#arastirma">Araştırma</a><a href="/research.html">Araştırma Modu</a></nav>
+<nav class="nav"><a href="/">Ana Sayfa</a><a href="#seviye">Seviye Ölçme</a><a href="#quiz">Soru Çöz</a><a href="#uslu">Üslü İfadeler</a><a href="#koklu">Köklü İfadeler</a><a href="#arastirma">Araştırma</a><a href="/research.html">Araştırma Modu</a></nav>
 </header>
 <main>
 <section class="hero"><div class="eyebrow">9. SINIF · MATEMATİK PRATİĞİ</div><h1>KÖK & ÜS</h1><p>Konunu seç, soruyu çöz, açıklamayı incele ve ilerlemeni takip et.</p><span class="badge">YAPIMCI · MUSTAFA ŞAHİN · 9/D · ABDULKADİR KONUKOĞLU ANADOLU LİSESİ</span></section>
+
+<section id="seviye" class="card">
+<div class="tag">SEVİYE ÖLÇME</div>
+<h2>Matematik seviyeni ölç</h2>
+<p>Bu kısa ölçme testi, üslü ve köklü ifadelerdeki mevcut durumunu yaklaşık olarak belirlemek için hazırlanmıştır. Sonuç bir sınav notu değildir; başlangıç seviyeni görmek içindir.</p>
+<div class="level-box">
+<div>
+<div class="meta"><span id="levelCounter">1 / 10</span><span>Üslü + Köklü ifadeler</span></div>
+<div class="level-progress"><span id="levelProgress"></span></div>
+<div id="levelQuestion" class="level-question"></div>
+<div id="levelAnswers" class="level-answers"></div>
+<div class="level-actions"><button id="levelNext" disabled>Sonraki →</button><span id="levelHint" class="level-note">Cevabını seç.</span></div>
+</div>
+<div class="level-result"><div class="tag">SEVİYEN</div><div id="levelName" class="level-name">—</div><div id="levelScore" class="level-score">Test tamamlanınca gösterilir.</div></div>
+</div>
+</section>
 
 <section id="quiz" class="card">
 <div class="quiz-head"><div><div class="tag">ETKİLEŞİMLİ SORU ALANI</div><h2>Hadi matematik çözelim!</h2></div><div class="score">Puan: <span id="score">0</span></div></div>
@@ -83,6 +99,49 @@ function finish(){$('counter').textContent='Tur tamamlandı';$('topicLabel').tex
 document.querySelectorAll('[data-topic]').forEach(b=>b.addEventListener('click',()=>{topic=b.dataset.topic;document.querySelectorAll('[data-topic]').forEach(x=>x.classList.toggle('active',x===b));$('next').onclick=nextQuestion;begin();$('quiz').scrollIntoView({behavior:'smooth',block:'start'})}));
 $('next').addEventListener('click',nextQuestion);
 begin();
+
+// --- Seviye ölçme ---
+const levelQuestions=[
+{q:'2³ işleminin sonucu nedir?',a:['6','8','9','12'],c:1},
+{q:'5⁰ kaçtır?',a:['0','1','5','10'],c:1},
+{q:'3² · 3³ işlemi hangi kuvvettir?',a:['3⁵','3⁶','9⁵','3'],c:0},
+{q:'10⁻² kaçtır?',a:['0,1','0,01','0,2','100'],c:1},
+{q:'√49 kaçtır?',a:['6','7','8','14'],c:1},
+{q:'√72 en sade hâliyle hangisidir?',a:['6√2','8√2','3√8','12√2'],c:0},
+{q:'√27 + √12 kaçtır?',a:['4√3','5√3','6√3','7√3'],c:1},
+{q:'(2√3)² kaçtır?',a:['6','9','12','18'],c:2},
+{q:'4³ ÷ 4² kaçtır?',a:['2','4','8','16'],c:1},
+{q:'3⁻² kaçtır?',a:['-9','1/3','1/9','9'],c:2}
+];
+let levelIndex=0,levelCorrect=0,levelAnswered=false;
+function renderLevel(){
+const q=levelQuestions[levelIndex];levelAnswered=false;
+$('levelCounter').textContent=(levelIndex+1)+' / '+levelQuestions.length;
+$('levelProgress').style.width=(levelIndex/levelQuestions.length*100)+'%';
+$('levelQuestion').textContent=q.q;$('levelHint').textContent='Cevabını seç.';$('levelNext').disabled=true;
+const box=$('levelAnswers');box.innerHTML='';
+q.a.forEach((x,i)=>{const b=document.createElement('button');b.textContent=String.fromCharCode(65+i)+') '+x;b.onclick=()=>answerLevel(i);box.appendChild(b)});
+}
+function answerLevel(choice){
+if(levelAnswered)return;levelAnswered=true;const q=levelQuestions[levelIndex],bs=[...$('levelAnswers').children];
+if(choice===q.c){levelCorrect++;bs[choice].classList.add('good');$('levelHint').textContent='✅ Doğru!'}
+else{bs[choice].classList.add('bad');bs[q.c].classList.add('good');$('levelHint').textContent='❌ Doğru cevap: '+q.a[q.c]}
+bs.forEach(b=>b.disabled=true);$('levelNext').disabled=false;
+$('levelNext').textContent=levelIndex===levelQuestions.length-1?'Seviyemi göster →':'Sonraki →';
+}
+function finishLevel(){
+const p=levelCorrect/levelQuestions.length*100;let name,desc;
+if(p<40){name='Başlangıç';desc='Temel kuralları pekiştirmen iyi olur.'}
+else if(p<70){name='Gelişiyor';desc='Temel konuların bir kısmına hakimsin; düzenli pratik faydalı olur.'}
+else if(p<90){name='İyi';desc='9. sınıf düzeyindeki temel konularda iyi durumdasın.'}
+else{name='İleri';desc='Bu ölçme testinde çok güçlü bir performans gösterdin.'}
+$('levelProgress').style.width='100%';$('levelName').textContent=name;$('levelScore').textContent=levelCorrect+' / '+levelQuestions.length+' doğru · %'+Math.round(p)+'<br>'+desc;
+$('levelQuestion').textContent='Seviye ölçme tamamlandı 🎯';$('levelAnswers').innerHTML='';$('levelHint').textContent='Tekrar ölçmek için aşağıdaki düğmeye bas.';
+$('levelNext').disabled=false;$('levelNext').textContent='Tekrar ölç ↻';$('levelNext').onclick=()=>{levelIndex=0;levelCorrect=0;renderLevel()};
+}
+$('levelNext').onclick=()=>{if(!levelAnswered)return;levelIndex++;if(levelIndex<levelQuestions.length)renderLevel();else finishLevel()};
+renderLevel();
+
 </script>
 </body>
 </html>
