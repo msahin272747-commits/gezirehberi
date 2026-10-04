@@ -129,6 +129,59 @@ export default {
         return playersApi(request, env);
       }
 
+      if (url.pathname === "/api/research/events") {
+        if (!env.KOKUS_DATA) return json({ ok:false, error:"KOKUS_DATA KV bağlantısı bulunamadı." },500);
+        if (request.method !== "POST") return json({ ok:false, error:"Yöntem desteklenmiyor." },405);
+        let body;
+        try { body = await request.json(); } catch { return json({ok:false,error:"Geçersiz JSON."},400); }
+        const participantId=String(body?.participantId||"").slice(0,64);
+        const phase=String(body?.phase||"adaptive").slice(0,32);
+        const questionId=String(body?.questionId||"").slice(0,80);
+        const topic=String(body?.topic||"").slice(0,32);
+        const difficulty=String(body?.difficulty||"").slice(0,32);
+        const correct=!!body?.correct;
+        const responseTimeMs=Math.min(120000,Math.max(0,Number(body?.responseTimeMs)||0));
+        if(!participantId||!questionId||!topic) return json({ok:false,error:"Eksik araştırma verisi."},400);
+        const event={participantId,phase,questionId,topic,difficulty,correct,responseTimeMs,timestamp:new Date().toISOString()};
+        const id=crypto.randomUUID();
+        await env.KOKUS_DATA.put("research:event:"+id,JSON.stringify(event),{expirationTtl:60*60*24*180});
+        return json({ok:true,id});
+      }
+
+      if (url.pathname === "/api/research/summary") {
+        if (!env.KOKUS_DATA) return json({ ok:false, error:"KOKUS_DATA KV bağlantısı bulunamadı." },500);
+        if (request.method !== "GET") return json({ok:false,error:"Yöntem desteklenmiyor."},405);
+        const listed=await env.KOKUS_DATA.list({prefix:"research:event:",limit:1000});
+        const events=[];
+        for(const key of listed.keys||[]){
+          try{
+            const value=await env.KOKUS_DATA.get(key.name);
+            if(value) events.push(JSON.parse(value));
+          }catch{}
+        }
+        const participants=new Set(events.map(e=>e.participantId));
+        const byPhase={};
+        for(const e of events){
+          const p=byPhase[e.phase] ||= {events:0,correct:0,totalResponseMs:0};
+          p.events++; p.correct+=e.correct?1:0; p.totalResponseMs+=Number(e.responseTimeMs)||0;
+        }
+        Object.values(byPhase).forEach(p=>{p.accuracy=p.events?Math.round(p.correct/p.events*100):0;p.avgResponseMs=p.events?Math.round(p.totalResponseMs/p.events):0;delete p.totalResponseMs;});
+        return json({ok:true,eventCount:events.length,participantCount:participants.size,byPhase});
+      }
+
+      if (url.pathname === "/api/research/export") {
+        if (!env.KOKUS_DATA) return json({ ok:false, error:"KOKUS_DATA KV bağlantısı bulunamadı." },500);
+        if (request.method !== "GET") return json({ok:false,error:"Yöntem desteklenmiyor."},405);
+        const key=String(request.headers.get("x-research-key")||"");
+        if (!env.RESEARCH_ADMIN_KEY || key!==env.RESEARCH_ADMIN_KEY) return json({ok:false,error:"Araştırma yönetici anahtarı gerekli."},401);
+        const listed=await env.KOKUS_DATA.list({prefix:"research:event:",limit:1000});
+        const events=[];
+        for(const item of listed.keys||[]){
+          try{const value=await env.KOKUS_DATA.get(item.name);if(value)events.push(JSON.parse(value));}catch{}
+        }
+        return json({ok:true,events});
+      }
+
       // English 9 only: math/root asset handling remains unchanged.
       if (
         url.pathname === "/english9" ||
