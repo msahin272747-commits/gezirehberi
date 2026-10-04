@@ -10,3 +10,6 @@ run_worker_first = ["/api/*"]
 [[kv_namespaces]]
 binding = "KOKUS_DATA"
 id = "c4da64e2f28047809396b80ce49208c8"
+
+[secrets]
+required = ["RESEARCH_ADMIN_KEY"]
