@@ -120,6 +120,90 @@ async function playersApi(request, env) {
   return json({ ok: true, players, ranking: sortPlayers(players) });
 }
 
+
+function adminCookie(token) {
+  return `admin_session=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=28800`;
+}
+function clearAdminCookie() {
+  return "admin_session=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0";
+}
+function base64url(bytes) {
+  let s = "";
+  for (const b of new Uint8Array(bytes)) s += String.fromCharCode(b);
+  return btoa(s).replace(/\\+/g,"-").replace(/\\//g,"_").replace(/=+$/,"");
+}
+function fromBase64url(s) {
+  const b = atob(s.replace(/-/g,"+").replace(/_/g,"/") + "=".repeat((4-s.length%4)%4));
+  const out = new Uint8Array(b.length);
+  for(let i=0;i<b.length;i++) out[i]=b.charCodeAt(i);
+  return out;
+}
+async function adminSign(value, secret) {
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), {name:"HMAC",hash:"SHA-256"}, false, ["sign"]);
+  return base64url(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value)));
+}
+async function adminSessionToken(secret) {
+  const payload = base64url(new TextEncoder().encode(JSON.stringify({exp:Date.now()+28800000})));
+  return payload + "." + await adminSign(payload, secret);
+}
+async function isAdmin(request, env) {
+  if(!env.ADMIN_PASSWORD) return false;
+  const header = request.headers.get("cookie") || "";
+  const match = header.match(/(?:^|;\\s*)admin_session=([^;]+)/);
+  if(!match) return false;
+  const [payload,sig] = match[1].split(".");
+  if(!payload || !sig) return false;
+  try {
+    const expected = await adminSign(payload, env.ADMIN_PASSWORD);
+    if(sig !== expected) return false;
+    const data = JSON.parse(new TextDecoder().decode(fromBase64url(payload)));
+    return Number(data.exp) > Date.now();
+  } catch { return false; }
+}
+async function adminLogin(request, env) {
+  if(request.method !== "POST") return json({ok:false,error:"Yöntem desteklenmiyor."},405);
+  if(!env.ADMIN_PASSWORD) return json({ok:false,error:"ADMIN_PASSWORD secret tanımlı değil."},503);
+  let body; try { body=await request.json(); } catch { return json({ok:false,error:"Geçersiz JSON."},400); }
+  const password=String(body?.password||"");
+  if(!password || password !== env.ADMIN_PASSWORD) return json({ok:false,error:"Yönetici şifresi yanlış."},401);
+  const token=await adminSessionToken(env.ADMIN_PASSWORD);
+  return new Response(JSON.stringify({success:true}),{status:200,headers:{"content-type":"application/json; charset=utf-8","cache-control":"no-store","set-cookie":adminCookie(token)}});
+}
+async function adminSession(request, env) {
+  return json({success:await isAdmin(request,env)});
+}
+async function adminLogout() {
+  return new Response(JSON.stringify({success:true}),{status:200,headers:{"content-type":"application/json; charset=utf-8","cache-control":"no-store","set-cookie":clearAdminCookie()}});
+}
+async function adminUsers(request, env) {
+  if(!await isAdmin(request,env)) return json({ok:false,error:"Yönetici oturumu gerekli."},401);
+  if(!env.KOKUS_DATA) return json({ok:false,error:"KOKUS_DATA KV bağlantısı bulunamadı."},500);
+  let players={};
+  try {
+    const raw=await env.KOKUS_DATA.get("players");
+    if(raw){ const parsed=JSON.parse(raw); players=cleanPlayers(parsed.players||parsed); }
+  } catch {}
+  if(request.method==="GET") return json({ok:true,users:Object.values(players).sort((a,b)=>b.points-a.points)});
+  let body={};
+  try{body=await request.json()}catch{return json({ok:false,error:"Geçersiz JSON."},400)}
+  const name=String(body?.name||"").trim().slice(0,22);
+  const key=Object.keys(players).find(k=>k.toLocaleLowerCase("tr-TR")===name.toLocaleLowerCase("tr-TR"));
+  if(!key) return json({ok:false,error:"Kullanıcı bulunamadı."},404);
+  if(request.method==="DELETE"){
+    delete players[key];
+  } else if(request.method==="PATCH"){
+    if(typeof body.visible==="boolean") players[key].visible=body.visible;
+    if(typeof body.active==="boolean") players[key].active=body.active;
+    if(typeof body.newName==="string" && body.newName.trim()){
+      const newName=body.newName.trim().slice(0,22);
+      if(newName!==key && players[newName]) return json({ok:false,error:"Bu kullanıcı adı zaten kullanılıyor."},409);
+      const updated=players[key]; updated.name=newName; delete players[key]; players[newName]=updated;
+    }
+  } else return json({ok:false,error:"Yöntem desteklenmiyor."},405);
+  await env.KOKUS_DATA.put("players",JSON.stringify({players,updatedAt:new Date().toISOString()}));
+  return json({ok:true,users:Object.values(players).sort((a,b)=>b.points-a.points)});
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -128,6 +212,11 @@ export default {
       if (url.pathname === "/api/data/players") {
         return playersApi(request, env);
       }
+      if (url.pathname === "/api/admin/login") return adminLogin(request, env);
+      if (url.pathname === "/api/admin/session") return adminSession(request, env);
+      if (url.pathname === "/api/admin/logout") return adminLogout();
+      if (url.pathname === "/api/admin/users") return adminUsers(request, env);
+
 
       if (url.pathname === "/api/research/events") {
         if (!env.KOKUS_DATA) return json({ ok:false, error:"KOKUS_DATA KV bağlantısı bulunamadı." },500);
