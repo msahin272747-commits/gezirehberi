@@ -10,6 +10,7 @@ const json = (data, status = 200) =>
 function cleanPlayer(p) {
   return {
     name: String(p?.name || "").trim().slice(0, 22),
+    deviceId: String(p?.deviceId || "").trim().slice(0, 80),
     points: Number(p?.points) || 0,
     correct: Number(p?.correct) || 0,
     wrong: Number(p?.wrong) || 0,
@@ -62,7 +63,8 @@ function mergePlayer(oldPlayer, newPlayer) {
     lastGame: newP.lastGame || oldP.lastGame,
     visible: newP.visible,
     active: newP.active,
-    bannedAt: newP.bannedAt || oldP.bannedAt
+    bannedAt: newP.bannedAt || oldP.bannedAt,
+    deviceId: newP.deviceId || oldP.deviceId
   };
 }
 
@@ -107,10 +109,18 @@ async function playersApi(request, env) {
 
   for (const [name, player] of Object.entries(incoming)) {
     const existingName = Object.keys(existing).find(
-      key => key.toLocaleLowerCase("tr-TR") === name.toLocaleLowerCase("tr-TR")
+      key =>
+        key.toLocaleLowerCase("tr-TR") === name.toLocaleLowerCase("tr-TR") ||
+        (player.deviceId && existing[key].deviceId === player.deviceId)
     );
     if (existingName) {
-      existing[existingName] = mergePlayer(existing[existingName], player);
+      const merged = mergePlayer(existing[existingName], player);
+      if (existingName !== name) {
+        delete existing[existingName];
+        existing[name] = merged;
+      } else {
+        existing[existingName] = merged;
+      }
     } else {
       existing[name] = player;
     }
