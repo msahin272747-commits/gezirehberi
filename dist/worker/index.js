@@ -11,6 +11,7 @@ function cleanPlayer(p) {
   return {
     name: String(p?.name || "").trim().slice(0, 22),
     deviceId: String(p?.deviceId || "").trim().slice(0, 80),
+    aliases: Array.isArray(p?.aliases) ? p.aliases.map(x => String(x).trim().slice(0,22)).filter(Boolean).slice(0,10) : [],
     points: Number(p?.points) || 0,
     correct: Number(p?.correct) || 0,
     wrong: Number(p?.wrong) || 0,
@@ -64,7 +65,8 @@ function mergePlayer(oldPlayer, newPlayer) {
     visible: newP.visible,
     active: newP.active,
     bannedAt: newP.bannedAt || oldP.bannedAt,
-    deviceId: newP.deviceId || oldP.deviceId
+    deviceId: newP.deviceId || oldP.deviceId,
+    aliases: [...new Set([...(oldP.aliases||[]), ...(newP.aliases||[])])].slice(-10)
   };
 }
 
@@ -111,7 +113,8 @@ async function playersApi(request, env) {
     const existingName = Object.keys(existing).find(
       key =>
         key.toLocaleLowerCase("tr-TR") === name.toLocaleLowerCase("tr-TR") ||
-        (player.deviceId && existing[key].deviceId === player.deviceId)
+        (player.deviceId && existing[key].deviceId === player.deviceId) ||
+        (Array.isArray(player.aliases) && player.aliases.some(alias => key.toLocaleLowerCase("tr-TR") === alias.toLocaleLowerCase("tr-TR")))
     );
     if (existingName) {
       const merged = mergePlayer(existing[existingName], player);
