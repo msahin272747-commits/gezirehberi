@@ -46,6 +46,13 @@ function bank(){
       void b; void e; void e2;
     }
   }
+  if(!(data.questions||[]).some(q=>q.boss&&q.id==='boss-hard-100')){
+    for(let n=1;n<=100;n++){
+      const a=2+(n%6), b=2+((n*3)%5), exponent=a+b+1;
+      const q=choice(`${a}^${exponent}`,[`${a}^${exponent-1}`,`${a}^${exponent+1}`,`${a}^${b}`],n+1700);
+      data.questions.push({id:`boss-hard-${n}`,topic:n%2?'uslu':'koklu',text:`Boss: (${a}³ × ${a}⁴) ÷ ${a}⁻${b} işleminin sonucu?`,options:q.options,correctAnswer:q.correctAnswer,explanation:'Üs kurallarını birlikte uygula: çarpımda üsler toplanır, negatif üs bölmede paya geçer.',difficulty:'boss',kind:'boss',boss:true,hard:true});
+    }
+  }
   // Zorluk garantisi
   data.questions=(data.questions||[]).map(q=>({...q,difficulty:q.boss?'boss':'zor',hard:true}));
   save();
