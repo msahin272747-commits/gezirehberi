@@ -46,11 +46,36 @@ function bank(){
       void b; void e; void e2;
     }
   }
-  if(!(data.questions||[]).some(q=>q.boss&&q.id==='boss-hard-100')){
+  // 100 adet gerçekten farklı Boss sorusu: 50 üslü + 50 köklü
+  if(!(data.questions||[]).some(q=>q.boss&&q.id==='boss-v2-100')){
+    data.questions=(data.questions||[]).filter(q=>!(q.boss===true || /^boss-hard-\d+$/.test(String(q.id||''))));
+    const bossChoice=(ans,wrong,n)=>choice(ans,wrong,n+3000);
     for(let n=1;n<=100;n++){
-      const a=2+(n%6), b=2+((n*3)%5), exponent=a+b+1;
-      const q=choice(`${a}^${exponent}`,[`${a}^${exponent-1}`,`${a}^${exponent+1}`,`${a}^${b}`],n+1700);
-      data.questions.push({id:`boss-hard-${n}`,topic:n%2?'uslu':'koklu',text:`Boss: (${a}³ × ${a}⁴) ÷ ${a}⁻${b} işleminin sonucu?`,options:q.options,correctAnswer:q.correctAnswer,explanation:'Üs kurallarını birlikte uygula: çarpımda üsler toplanır, negatif üs bölmede paya geçer.',difficulty:'boss',kind:'boss',boss:true,hard:true});
+      if(n<=50){
+        const a=2+(n%7), b=2+((n*3)%6), c=2+((n*5)%5), d=1+(n%4);
+        const exp=3+b-c+d;
+        const templates=[
+          \`(\${a}³ × \${a}⁴) ÷ \${a}⁻\${b}\`,
+          \`(\${a}²)⁴ × \${a}⁻\${c} ÷ \${a}⁻\${d}\`,
+          \`(\${a}⁵ ÷ \${a}²) × \${a}⁻\${c}\`,
+          \`(\${a}⁻² × \${a}⁶) ÷ \${a}⁻\${d}\`
+        ];
+        const expr=templates[n%templates.length];
+        const ans=String(a)+\`^\${exp}\`;
+        const wrong=[String(a)+\`^\${exp-1}\`,String(a)+\`^\${exp+1}\`,String(a)+\`^\${Math.max(1,exp-2)}\`];
+        const q=bossChoice(ans,wrong,n);
+        data.questions.push({id:\`boss-v2-\${n}\`,topic:'uslu',text:\`Boss: \${expr} işleminin sonucu hangi seçenektir?\`,options:q.options,correctAnswer:q.correctAnswer,explanation:'Aynı tabanda çarpma ve bölmede üs kurallarını sırayla uygula.',difficulty:'boss',kind:'boss',boss:true,hard:true});
+      }else{
+        const k=2+(n%8), m=2+(n%5), p=2+((n*3)%5);
+        const rad1=m*m*k, rad2=p*p*k;
+        let expr,ans,wrong;
+        if(n%4===1){ expr=\`√\${rad1} + √\${rad2}\`; const val=m+p; ans=\`\${val}√\${k}\`; wrong=[\`\${val-1}√\${k}\`,\`\${val+1}√\${k}\`,\`\${val}√\${k+1}\`]; }
+        else if(n%4===2){ expr=\`√\${rad1} - √\${rad2}\`; const val=Math.abs(m-p); ans=\`\${val}√\${k}\`; wrong=[\`\${val+1}√\${k}\`,\`\${Math.max(1,val-1)}√\${k}\`,\`\${val}√\${k+1}\`]; }
+        else if(n%4===3){ expr=\`√\${rad1} × √\${k}\`; const val=m*k; ans=String(val); wrong=[String(val+k),String(m+k),String(val-k)]; }
+        else { expr=\`√\${rad1} ÷ √\${k}\`; const val=m; ans=String(val); wrong=[String(val+1),String(Math.max(1,val-1)),String(val*k)]; }
+        const q=bossChoice(ans,wrong,n);
+        data.questions.push({id:\`boss-v2-\${n}\`,topic:'koklu',text:\`Boss: \${expr} işleminin sadeleşmiş sonucu nedir?\`,options:q.options,correctAnswer:q.correctAnswer,explanation:'Köklü ifadeleri çarpanlarına ayır, benzer köklü terimleri birleştir ve sadeleştir.',difficulty:'boss',kind:'boss',boss:true,hard:true});
+      }
     }
   }
   // Zorluk garantisi
