@@ -113,6 +113,7 @@ migrate();bank();archiveWeek();render();syncSponsors();
       out[name]={
         name,
         deviceId:String(u.deviceId||'').trim(),
+        aliases:Array.isArray(u.aliases)?u.aliases:[],
         points:Number(u.totalScore??u.score??0)||0,
         correct:Number(u.correct||0)||0,
         wrong:Number(u.wrong||0)||0,
@@ -207,9 +208,13 @@ migrate();bank();archiveWeek();render();syncSponsors();
       return;
     }
     if(selected){
+      const oldName=String(selected.username||selected.name||'').trim();
+      if(oldName && oldName.toLocaleLowerCase('tr-TR')!==nameKey){
+        selected.aliases=Array.from(new Set([...(selected.aliases||[]),oldName])).slice(-10);
+      }
       selected.username=name; selected.name=name; selected.deviceId=deviceId;
     }else{
-      selected={userId:crypto.randomUUID(),username:name,name,deviceId,score:0,totalScore:0,correct:0,wrong:0,gamesPlayed:0,bestCombo:0,maxCombo:0,combo:0,quickCorrect:0,radicalCorrect:0,exponentCorrect:0,history:[],claimedRewards:[],visible:true,active:true};
+      selected={userId:crypto.randomUUID(),username:name,name,deviceId,score:0,totalScore:0,correct:0,wrong:0,gamesPlayed:0,bestCombo:0,maxCombo:0,combo:0,quickCorrect:0,radicalCorrect:0,exponentCorrect:0,history:[],claimedRewards:[],aliases:[],visible:true,active:true};
       data.users.push(selected);
     }
     localStorage.setItem(USER_KEY,selected.userId);
