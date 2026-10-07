@@ -89,6 +89,39 @@
     }
   }
 
+  // Mevcut BOSS kategorisine de geniş soru havuzu ekle.
+  for(let i=1;i<=100;i++){
+    const a=2+(i%7), b=2+(Math.floor(i/3)%5), c=2+(Math.floor(i/7)%6), mode=i%6;
+    if(mode<3){
+      let ans,text,opts;
+      if(mode===0){
+        ans=Math.pow(a,b+c); text=`(${a}^${b}) × (${a}^${c}) = ?`;
+        opts=[Math.pow(a,b+c-1),Math.pow(a,b*c),Math.pow(a,b+c+1)];
+      }else if(mode===1){
+        ans=Math.pow(a,b*c); text=`(${a}^${b})^${c} = ?`;
+        opts=[Math.pow(a,b+c),Math.pow(a,b*c-1),Math.pow(a,b*c+1)];
+      }else{
+        ans=Math.pow(2,b)+Math.pow(2,b); text=`2^${b} + 2^${b} = ?`;
+        opts=[Math.pow(2,b+1),Math.pow(2,b),Math.pow(2,b+2)];
+      }
+      add('boss','extra-boss-uslu-'+i,text,ans,opts,'boss','Boss sorusunda üslü ifade kurallarını sırayla uygula.');
+    }else{
+      const rad=a*a*b, rad2=c*c*b;
+      let ans,text,opts;
+      if(mode===3){
+        ans=`${a+c}√${b}`; text=`√${rad} + √${rad2} = ?`;
+        opts=[`${a+c-1}√${b}`,`${a+c+1}√${b}`,`${a*c}√${b}`];
+      }else if(mode===4){
+        ans=`${Math.abs(a-c)}√${b}`; text=`√${rad} - √${rad2} = ?`;
+        opts=[`${a+c}√${b}`,`${Math.abs(a-c)+1}√${b}`,`${a*c}√${b}`];
+      }else{
+        ans=a*a*b; text=`(${a}√${b})² = ?`;
+        opts=[a*b,a*a+b,a*b*b];
+      }
+      add('boss','extra-boss-koklu-'+i,text,ans,opts,'boss','Boss sorusunda kökü önce sadeleştir, sonra işlemi tamamla.');
+    }
+  }
+
   localStorage.setItem('kokus-extra-bank-version',VERSION);
   try{localStorage.setItem('kokus_data_v13',JSON.stringify(data));}catch(e){}\n  location.reload();
 })();
