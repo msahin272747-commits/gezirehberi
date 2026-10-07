@@ -19,7 +19,10 @@ function cleanPlayer(p) {
     quickCorrect: Number(p?.quickCorrect) || 0,
     radicalCorrect: Number(p?.radicalCorrect) || 0,
     exponentCorrect: Number(p?.exponentCorrect) || 0,
-    lastGame: String(p?.lastGame || "Henüz oyun oynanmadı").slice(0, 200)
+    lastGame: String(p?.lastGame || "Henüz oyun oynanmadı").slice(0, 200),
+    visible: p?.visible !== false,
+    active: p?.active !== false,
+    bannedAt: p?.bannedAt ? String(p.bannedAt).slice(0, 64) : ""
   };
 }
 
@@ -34,7 +37,7 @@ function cleanPlayers(players) {
 }
 
 function sortPlayers(players) {
-  return Object.values(players).sort(
+  return Object.values(players).filter(p => p.visible !== false && p.active !== false).sort(
     (a, b) =>
       b.points - a.points ||
       b.correct - a.correct ||
@@ -56,7 +59,10 @@ function mergePlayer(oldPlayer, newPlayer) {
     quickCorrect: Math.max(oldP.quickCorrect, newP.quickCorrect),
     radicalCorrect: Math.max(oldP.radicalCorrect, newP.radicalCorrect),
     exponentCorrect: Math.max(oldP.exponentCorrect, newP.exponentCorrect),
-    lastGame: newP.lastGame || oldP.lastGame
+    lastGame: newP.lastGame || oldP.lastGame,
+    visible: newP.visible,
+    active: newP.active,
+    bannedAt: newP.bannedAt || oldP.bannedAt
   };
 }
 
