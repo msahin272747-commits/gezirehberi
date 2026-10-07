@@ -206,6 +206,10 @@ async function adminUsers(request, env) {
   let body={};
   try{body=await request.json()}catch{return json({ok:false,error:"Geçersiz JSON."},400)}
   const name=String(body?.name||"").trim().slice(0,22);
+  if(request.method==="DELETE" && name==="__ALL__"){
+    await env.KOKUS_DATA.put("players",JSON.stringify({players:{},updatedAt:new Date().toISOString()}));
+    return json({ok:true,users:[],reset:true});
+  }
   const key=Object.keys(players).find(k=>k.toLocaleLowerCase("tr-TR")===name.toLocaleLowerCase("tr-TR"));
   if(!key) return json({ok:false,error:"Kullanıcı bulunamadı."},404);
   if(request.method==="DELETE"){
