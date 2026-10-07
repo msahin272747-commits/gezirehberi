@@ -87,7 +87,5 @@
   }
 
   localStorage.setItem('kokus-extra-bank-version',VERSION);
-  try{localStorage.setItem('kokus_data_v13',JSON.stringify(window.data));}catch(e){}
-  const count=document.getElementById('totalQuestions');
-  if(count)count.textContent=questions.length;
+  try{localStorage.setItem('kokus_data_v13',JSON.stringify(data));}catch(e){}\n  location.reload();
 })();
