@@ -52,8 +52,8 @@
   // 200 özgün Boss sorusu
   made=0;
   for(let a=2;a<=7&&made<200;a++)for(let b=2;b<=6&&made<200;b++)for(let c=2;c<=5&&made<200;c++){
-    const ans=a**(b*c);
-    if(add('boss',`[${a}^${b} × ${a}^${c}]² ÷ ${a}^{${b+c}} işleminin sonucu nedir?`,String(ans),[String(a**(b+c)),String(a**(b*c-1)),String(a**(b*c+1))],'boss','boss'))made++;
+    const ans=a**(b+c);
+    if(add('boss',`[${a}^${b} × ${a}^${c}]² ÷ ${a}^{${b+c}} işleminin sonucu nedir?`,String(ans),[String(a**(b+c-1)),String(a**(b*c-1)),String(a**(b*c+1))],'boss','boss'))made++;
     if(made>=200)break;
     const root=a*a*b;
     if(add('boss',`√${root} × √${b} işleminin sonucu nedir?`,a*b,[a+b,a*a*b,b*b*a],'boss','boss'))made++;
