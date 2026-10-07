@@ -125,6 +125,19 @@ function selectQuestion(topic,mode='normal',reward=false){
   const slots=['A','B','C','D'].filter(x=>x!==game.correctSlots.at(-1));
   const balanced=pool.filter(q=>slots.includes(q.correctAnswer));
   if(balanced.length)pool=balanced;
+  // Soru havuzu herhangi bir nedenle boşsa oyunu kilitleme; zor bir yedek soru üret.
+  if(!pool.length){
+    pool=[{
+      id:'fallback-hard-'+Date.now(),
+      topic:topic==='koklu'?'koklu':'uslu',
+      text:topic==='koklu'?'√72 + √8 işleminin sonucu nedir?':'2^5 · 2^3 işleminin sonucu nedir?',
+      options:topic==='koklu'?['8√2','10√2','12√2','14√2']:['2^6','2^7','2^8','2^9'],
+      correctAnswer:topic==='koklu'?'A':'C',
+      explanation:topic==='koklu'?'√72=6√2 ve √8=2√2, toplam 8√2.':'Aynı tabanlı üslerde üsler toplanır: 5+3=8.',
+      difficulty:'zor',
+      hard:true
+    }];
+  }
   const researchGroup=localStorage.getItem('kokus-research-group')||'';if(!user||reward||mode==='boss'||researchGroup==='control'||!pool.length)return pool[Math.floor(Math.random()*pool.length)]||null;
   const stats=user.topicStats||{};
   const topicPool=pool.map(q=>{
@@ -151,7 +164,13 @@ function start(topic,reward=false,mode='normal'){
     if(!user){if(input)input.focus();return}
   }
   game={topic:topic||'mixed',mode,reward,seen:[],answers:[],correctSlots:[]};
-  showQuestion();
+  try{
+    showQuestion();
+    document.getElementById('modal')?.classList.add('show');
+  }catch(error){
+    console.error('Oyun başlatılamadı:',error);
+    alert('Soru açılırken hata oluştu. Sayfayı Ctrl+F5 ile yenileyip tekrar dene.');
+  }
 }
 function showQuestion(){current=selectQuestion(game.topic,game.mode,game.reward);if(!current){alert('Bu koşullarda gösterilecek yeni soru bulunamadı.');closeQuiz();return}game.seen.push(current.id);game.questionStartedAt=performance.now();answered=false;document.getElementById('modal').classList.add('show');document.getElementById('quizTag').textContent=game.reward?'🎁 ÖDÜLLÜ SORU':game.mode==='boss'?'👑 BOSS SORUSU':'🔥 ZOR SORU';document.getElementById('question').textContent=current.text;document.getElementById('result').style.display='none';document.getElementById('next').style.display='none';const box=document.getElementById('answers');box.innerHTML='';current.options.forEach((o,i)=>{const letter='ABCD'[i],b=document.createElement('button');b.type='button';b.textContent=letter+'. '+o;b.onclick=function(e){e.preventDefault();e.stopPropagation();answer(letter)};b.addEventListener('pointerdown',function(e){e.stopPropagation()},{passive:true});box.appendChild(b)})}
 function answer(letter){
