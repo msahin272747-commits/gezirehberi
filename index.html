@@ -103,6 +103,8 @@ function bank(){
     ['koklu','√128 - √32 + √8 işleminin sonucu?','6√2',['4√2','8√2','10√2']]
   ];
   boss.forEach((x,i)=>push(x[0],x[1],x[2],x[3],'boss','boss'));
+  // Kullanıcıların "kolay" bulduğu eski havuzu da zor seviyeye yükselt.
+  data.questions=data.questions.map(q=>({...q,difficulty:'zor',hard:true}));
   save();
 }
 function normalizeUsername(value){return value.trim().replace(/\s+/g,' ')}
@@ -113,6 +115,8 @@ let game={topic:'mixed',mode:'normal',seen:[],answers:[],correctSlots:[],questio
 function validReward(q){const today=new Date().toISOString().slice(0,10);return q.active!==false&&(!q.start||q.start<=today)&&(!q.end||q.end>=today)}
 function selectQuestion(topic,mode='normal',reward=false){
   let user=currentUser(), pool=reward?data.rewardQuestions.filter(validReward):data.questions.filter(q=>topic==='mixed'||q.topic===topic);
+  // Normal oyunda bile yalnızca zor/boss seviyedeki sorular gösterilir.
+  if(!reward) pool=pool.filter(q=>q.difficulty==='zor'||q.difficulty==='boss'||q.hard===true);
   if(mode==='boss')pool=pool.filter(q=>q.boss===true||q.difficulty==='boss');
   const recent=new Set([...(user?.history||[]).slice(-25),...game.seen]);
   let preferred=pool.filter(q=>!recent.has(q.id));
@@ -148,7 +152,7 @@ function start(topic,reward=false,mode='normal'){
   game={topic:topic||'mixed',mode,reward,seen:[],answers:[],correctSlots:[]};
   showQuestion();
 }
-function showQuestion(){current=selectQuestion(game.topic,game.mode,game.reward);if(!current){alert('Bu koşullarda gösterilecek yeni soru bulunamadı.');closeQuiz();return}game.seen.push(current.id);game.questionStartedAt=performance.now();answered=false;document.getElementById('modal').classList.add('show');document.getElementById('quizTag').textContent=game.reward?'🎁 ÖDÜLLÜ SORU':game.mode==='boss'?'👑 BOSS SORUSU':'OYUN SORUSU';document.getElementById('question').textContent=current.text;document.getElementById('result').style.display='none';document.getElementById('next').style.display='none';const box=document.getElementById('answers');box.innerHTML='';current.options.forEach((o,i)=>{const b=document.createElement('button');b.textContent='ABCD'[i]+'. '+o;b.onclick=()=>answer('ABCD'[i]);box.appendChild(b)})}
+function showQuestion(){current=selectQuestion(game.topic,game.mode,game.reward);if(!current){alert('Bu koşullarda gösterilecek yeni soru bulunamadı.');closeQuiz();return}game.seen.push(current.id);game.questionStartedAt=performance.now();answered=false;document.getElementById('modal').classList.add('show');document.getElementById('quizTag').textContent=game.reward?'🎁 ÖDÜLLÜ SORU':game.mode==='boss'?'👑 BOSS SORUSU':'🔥 ZOR SORU';document.getElementById('question').textContent=current.text;document.getElementById('result').style.display='none';document.getElementById('next').style.display='none';const box=document.getElementById('answers');box.innerHTML='';current.options.forEach((o,i)=>{const b=document.createElement('button');b.textContent='ABCD'[i]+'. '+o;b.onclick=()=>answer('ABCD'[i]);box.appendChild(b)})}
 function answer(letter){
   if(answered)return;
   answered=true;
