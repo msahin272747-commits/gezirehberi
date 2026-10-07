@@ -245,8 +245,15 @@ migrate();bank();archiveWeek();render();syncSponsors();
       if(!r.ok) throw new Error('HTTP '+r.status);
       const j=await r.json();
       if(j.ok && j.players){
-        mergeRemote(j.players);
-        originalSave.call(window);
+        if(Object.keys(j.players).length===0){
+          data.users=[];
+          data.weeklyChampions=[];
+          localStorage.removeItem(USER_KEY);
+          originalSave.call(window);
+        }else{
+          mergeRemote(j.players);
+          originalSave.call(window);
+        }
         render();
       }
     }catch(e){ console.warn('Merkezi sıralama alınamadı:',e); }
