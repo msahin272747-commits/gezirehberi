@@ -73,7 +73,8 @@ function bank(){
     koklu.push([k+'√'+r+' + '+k+'√'+r+' işleminin sonucu?',c,[(k+1)+'√'+r,(2*k-1)+'√'+r,k+'√'+(r+1)]]);
     if(koklu.length<88)koklu.push([k+'√'+r+' - '+(k-1)+'√'+r+' işleminin sonucu?','√'+r,[k+'√'+r,(k-2)+'√'+r,'1']]);
   }
-  for(let n=2;n<=20&&koklu.length<100;n++){
+  for(let n=2;n<=40&&koklu.length<100;n++){
+    if(Number.isInteger(Math.sqrt(n))) continue;
     const s=Math.floor(Math.sqrt(n)),c='√'+n;
     koklu.push(['√'+n+' sayısı hangi aralıktadır?',s+' ile '+(s+1)+' arasındadır',[String(s-1)+' ile '+s+' arasındadır',String(s+1)+' ile '+(s+2)+' arasındadır',String(n)+' ile '+(n+1)+' arasındadır]]);
   }
