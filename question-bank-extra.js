@@ -11,8 +11,11 @@
   const shuffle=(arr)=>{const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
   const add=(id,topic,text,answer,options,difficulty='orta',explanation='')=>{
     if(used.has(id))return;
-    const all=shuffle([String(answer),...options.map(String)]).slice(0,4);
-    const correctAnswer='ABCD'[all.indexOf(String(answer))];
+    const correct=String(answer);
+    const unique=[...new Set(options.map(String).filter(x=>x!==correct))];
+    while(unique.length<3) unique.push('Bu seçenek değil');
+    const all=shuffle([correct,...unique.slice(0,3)]);
+    const correctAnswer='ABCD'[all.indexOf(correct)];
     questions.push({id,topic,text,options:all,correctAnswer,explanation:explanation||('Doğru sonuç: '+answer+'. İşlemi üs/kök kurallarını kullanarak kontrol et.'),difficulty,kind:difficulty==='zor'?'yorum':'işlem'});
     used.add(id);
   };
