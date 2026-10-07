@@ -35,7 +35,7 @@ function validReward(q){const today=new Date().toISOString().slice(0,10);return 
 function selectQuestion(topic,mode='normal',reward=false){
   let user=currentUser(), pool=reward?data.rewardQuestions.filter(validReward):data.questions.filter(q=>topic==='mixed'||q.topic===topic);
   if(mode==='boss')pool=pool.filter(q=>q.boss===true||q.difficulty==='boss');
-  const recent=new Set([...(user?.history||[]).slice(-25),...game.seen]);
+  const recent=new Set([...(user?.history||[]).slice(-1000),...game.seen]);
   let preferred=pool.filter(q=>!recent.has(q.id));
   pool=preferred.length?preferred:pool.filter(q=>!game.seen.includes(q.id));
   const slots=['A','B','C','D'].filter(x=>x!==game.correctSlots.at(-1));
@@ -68,7 +68,7 @@ function answer(letter){
   user.topicStats=user.topicStats||{uslu:{correct:0,wrong:0},koklu:{correct:0,wrong:0}};
   user.topicStats[current.topic]=user.topicStats[current.topic]||{correct:0,wrong:0};
   user.topicStats[current.topic][ok?'correct':'wrong']++;
-  user.responseTimes=[...(user.responseTimes||[]),responseTimeMs].slice(-200);const points=ok?(game.mode==='boss'?50:(rewarded?(+current.rewardPoints||100):10)):0;if(ok){user.totalScore=(user.totalScore??user.score??0)+points;user.score=user.totalScore;user.correct++;user.combo++;user.bestCombo=Math.max(user.bestCombo||user.maxCombo||0,user.combo);user.maxCombo=user.bestCombo;if(rewarded)user.claimedRewards.push(current.id)}else{user.wrong++;user.combo=0}user.history=[...(user.history||[]),current.id].slice(-100);game.answers.push({id:current.id,ok});game.correctSlots.push(current.correctAnswer);data.games++;user.gamesPlayed=(user.gamesPlayed??user.games??0)+1;user.games=user.gamesPlayed;save();archiveWeek();logResearchEvent({questionId:current.id,topic:current.topic,difficulty:current.difficulty,correct:ok,responseTimeMs});render();const r=document.getElementById('result');r.style.display='block';r.innerHTML=(ok?'✅ <b>DOĞRU!</b>':'❌ <b>YANLIŞ!</b>')+(ok?` +${points} puan`:'')+'<br><b>Doğru cevap:</b> '+current.correctAnswer+'. '+current.options['ABCD'.indexOf(current.correctAnswer)]+'<br><b>Kısa açıklama:</b> '+current.explanation;document.getElementById('next').style.display='inline-block'}
+  user.responseTimes=[...(user.responseTimes||[]),responseTimeMs].slice(-200);const points=ok?(game.mode==='boss'?50:(rewarded?(+current.rewardPoints||100):10)):0;if(ok){user.totalScore=(user.totalScore??user.score??0)+points;user.score=user.totalScore;user.correct++;user.combo++;user.bestCombo=Math.max(user.bestCombo||user.maxCombo||0,user.combo);user.maxCombo=user.bestCombo;if(rewarded)user.claimedRewards.push(current.id)}else{user.wrong++;user.combo=0}user.history=[...(user.history||[]),current.id].slice(-1000);game.answers.push({id:current.id,ok});game.correctSlots.push(current.correctAnswer);data.games++;user.gamesPlayed=(user.gamesPlayed??user.games??0)+1;user.games=user.gamesPlayed;save();archiveWeek();logResearchEvent({questionId:current.id,topic:current.topic,difficulty:current.difficulty,correct:ok,responseTimeMs});render();const r=document.getElementById('result');r.style.display='block';r.innerHTML=(ok?'✅ <b>DOĞRU!</b>':'❌ <b>YANLIŞ!</b>')+(ok?` +${points} puan`:'')+'<br><b>Doğru cevap:</b> '+current.correctAnswer+'. '+current.options['ABCD'.indexOf(current.correctAnswer)]+'<br><b>Kısa açıklama:</b> '+current.explanation;document.getElementById('next').style.display='inline-block'}
 async function logResearchEvent(event){
   try{
     const consent=localStorage.getItem('kokus-research-consent')==='yes';
