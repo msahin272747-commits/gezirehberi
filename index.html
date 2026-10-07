@@ -13,7 +13,12 @@
 </main><footer><div class="shell grid three"><div><b>KÖK & ÜS</b><p>9. Sınıf Matematik Oyun Akademisi</p></div><div><b>ABDULKADİR KONUKOĞLU ANADOLU LİSESİ</b><p>Konular • Oyunlar • Hakkında</p></div><div><b>YAPIMCI MUSTAFA ŞAHİN 9/D</b><p>Sürüm 1.3 · Matematiği oyuna dönüştür.</p><a href="admin.html" style="color:#8ecfff">Yönetim</a></div></div></footer>
 <div id="profileModal" class="modal"><div class="quiz glass profile-card"><button class="close" onclick="closeProfile()">×</button><div class="tag">OYUNCU PROFİLİ</div><h3 id="profileName">Misafir oyuncu</h3><div id="profileStats" class="stats"></div><div id="profileAchievements" class="profile-achievements"></div></div></div><div id="modal" class="modal"><div class="quiz glass"><button class="close" onclick="closeQuiz()">×</button><div class="tag" id="quizTag">OYUN SORUSU</div><h3 id="question">Soru yükleniyor…</h3><div id="answers" class="answers"></div><div id="result" class="result"></div><button id="next" class="btn" style="display:none" onclick="nextQuestion()">Sonraki soru →</button></div></div>
 <script>
-const KEY='kokus_data_v13', USER_KEY='kokus_current_user';
+const KEY='kokus_data_v13', USER_KEY='kokus_current_user', DEVICE_KEY='kokus_device_id';
+function getDeviceId(){
+  let id=localStorage.getItem(DEVICE_KEY);
+  if(!id){id=crypto.randomUUID();localStorage.setItem(DEVICE_KEY,id)}
+  return id;
+}
 const defaultData={version:1,users:[],questions:[],rewardQuestions:[],announcements:[],sponsors:[],games:0,weeklyChampions:[],settings:{siteName:'KÖK & ÜS'}};
 const data=Object.assign(defaultData,JSON.parse(localStorage.getItem(KEY)||'{}'));
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}
@@ -107,6 +112,7 @@ migrate();bank();archiveWeek();render();syncSponsors();
       if(!name) return;
       out[name]={
         name,
+        deviceId:String(u.deviceId||'').trim(),
         points:Number(u.totalScore??u.score??0)||0,
         correct:Number(u.correct||0)||0,
         wrong:Number(u.wrong||0)||0,
@@ -124,17 +130,21 @@ migrate();bank();archiveWeek();render();syncSponsors();
 
   function mergeRemote(remote){
     const users=data.users||[];
-    const byName={};
-    users.forEach(u=>{const n=String(u.username||u.name||'').toLocaleLowerCase('tr-TR'); if(n) byName[n]=u;});
+    const byName={}, byDevice={};
+    users.forEach(u=>{
+      const n=String(u.username||u.name||'').toLocaleLowerCase('tr-TR');
+      if(n) byName[n]=u;
+      if(u.deviceId) byDevice[u.deviceId]=u;
+    });
     Object.values(remote||{}).forEach(p=>{
       const key=String(p.name||'').toLocaleLowerCase('tr-TR');
-      let u=byName[key];
+      let u=(p.deviceId&&byDevice[p.deviceId])||byName[key];
       if(!u){
         u={userId:crypto.randomUUID(),username:p.name,name:p.name,history:[],claimedRewards:[]};
         users.push(u);
         byName[key]=u;
       }
-      u.username=u.username||p.name; u.name=u.name||p.name;
+      u.username=p.name||u.username; u.name=p.name||u.name; u.deviceId=u.deviceId||p.deviceId||'';
       u.totalScore=Math.max(Number(u.totalScore??u.score??0),Number(p.points||0));
       u.score=u.totalScore;
       u.correct=Math.max(Number(u.correct||0),Number(p.correct||0));
@@ -182,13 +192,28 @@ migrate();bank();archiveWeek();render();syncSponsors();
   };
 
   window.setPlayerName=async function(value){
-    const name=String(value||'').trim();
-    if(!name) return;
-    const existing=(data.users||[]).find(u=>String(u.username||u.name||'').toLocaleLowerCase('tr-TR')===name.toLocaleLowerCase('tr-TR'));
-    if(existing){ data.users=data.users.filter(u=>u!==existing); data.users.push(existing); }
-    else data.users.push({userId:crypto.randomUUID(),username:name,name,score:0,totalScore:0,correct:0,wrong:0,gamesPlayed:0,bestCombo:0,maxCombo:0,combo:0,quickCorrect:0,radicalCorrect:0,exponentCorrect:0,history:[],claimedRewards:[]});
-    const selected=data.users.find(u=>String(u.username||u.name||'').toLocaleLowerCase('tr-TR')===name.toLocaleLowerCase('tr-TR'));
-    if(selected){ localStorage.setItem(USER_KEY, selected.userId); const input=document.getElementById('playerName'); if(input) input.value=selected.username||selected.name||name; }
+    const name=String(value||'').trim().replace(/\s+/g,' ');
+    if(name.length<2||name.length>24) return;
+    const deviceId=getDeviceId();
+    const nameKey=name.toLocaleLowerCase('tr-TR');
+    const currentId=localStorage.getItem(USER_KEY)||'';
+    let selected=(data.users||[]).find(u=>u.userId===currentId);
+    const sameDevice=(data.users||[]).find(u=>u.deviceId===deviceId);
+    if(sameDevice) selected=sameDevice;
+    const nameOwner=(data.users||[]).find(u=>String(u.username||u.name||'').toLocaleLowerCase('tr-TR')===nameKey && u.deviceId && u.deviceId!==deviceId);
+    if(nameOwner){
+      alert('Bu kullanıcı adı başka bir cihazda kullanılıyor. Bu cihazdaki profilin adını farklı seç.');
+      const input=document.getElementById('playerName'); if(input) input.value=selected?.username||selected?.name||'';
+      return;
+    }
+    if(selected){
+      selected.username=name; selected.name=name; selected.deviceId=deviceId;
+    }else{
+      selected={userId:crypto.randomUUID(),username:name,name,deviceId,score:0,totalScore:0,correct:0,wrong:0,gamesPlayed:0,bestCombo:0,maxCombo:0,combo:0,quickCorrect:0,radicalCorrect:0,exponentCorrect:0,history:[],claimedRewards:[],visible:true,active:true};
+      data.users.push(selected);
+    }
+    localStorage.setItem(USER_KEY,selected.userId);
+    const input=document.getElementById('playerName'); if(input) input.value=name;
     render();
     await window.save();
   };
