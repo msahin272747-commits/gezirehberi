@@ -24,7 +24,7 @@ function cleanQuestion(q){
  const correctAnswer=String(q?.correctAnswer||"A").toUpperCase();
  const topic=String(q?.topic||"uslu");
  if(!id||!text||options.length!==4||options.some(x=>!x)||new Set(options).size!==4||!["A","B","C","D"].includes(correctAnswer)||!["uslu","koklu"].includes(topic))return null;
- return {id,text,options,correctAnswer,explanation:String(q?.explanation||"").slice(0,1200),topic,difficulty:String(q?.difficulty||"orta").slice(0,32),boss:q?.boss===true,active:q?.active!==false,central:true,updatedAt:new Date().toISOString()};
+ return {id,sourceId:String(q?.sourceId||"").replace(/[^a-zA-Z0-9_-]/g,"").slice(0,100),text,options,correctAnswer,explanation:String(q?.explanation||"").slice(0,1200),topic,difficulty:String(q?.difficulty||"orta").slice(0,32),boss:q?.boss===true,active:q?.active!==false,central:true,updatedAt:new Date().toISOString()};
 }
 async function readCentralQuestions(env){let questions=[];try{const raw=await env.KOKUS_DATA.get("questions");if(raw){const parsed=JSON.parse(raw);questions=Array.isArray(parsed.questions)?parsed.questions:[]}}catch{}return questions.map(cleanQuestion).filter(Boolean)}
 async function publicQuestions(request,env){if(request.method!=="GET")return json({ok:false,error:"Yöntem desteklenmiyor."},405);if(!env.KOKUS_DATA)return json({ok:false,error:"KOKUS_DATA KV bağlantısı bulunamadı."},500);const questions=(await readCentralQuestions(env)).filter(q=>q.active!==false);return json({ok:true,questions})}
