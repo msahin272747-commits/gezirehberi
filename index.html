@@ -521,7 +521,8 @@ async function syncCentralQuestions(){
     if(!response.ok)return;
     const payload=await response.json();
     if(!payload.ok||!Array.isArray(payload.questions))return;
-    const local=(data.questions||[]).filter(q=>q.central!==true);
+    const centralIds=new Set(payload.questions.filter(q=>q&&q.central===true).map(q=>q.sourceId).filter(Boolean));
+    const local=(data.questions||[]).filter(q=>q.central!==true&&!centralIds.has(q.id));
     const central=payload.questions.filter(q=>q&&q.central===true);
     data.questions=[...local,...central];
     save();render();
