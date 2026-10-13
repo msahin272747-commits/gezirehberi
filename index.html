@@ -254,6 +254,13 @@ footer{background:#070812;border-color:#ffffff12}
 
 
 /* Personal progress dashboard */
+/* Topic mastery and learner level */
+.progress-level-line{padding:16px 18px;margin:0 0 16px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(100deg,#12284a99,#101b38aa)}
+.progress-level-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.progress-level-top b{font-size:14px;color:#d9f1ff}
+.progress-level-top span{font-size:11px;color:var(--muted);font-weight:700}
+.progress-level-line .progress-note{margin-bottom:0}
+
 .progress-dashboard{padding:26px;margin:24px auto}
 .progress-intro{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:22px}
 .progress-intro h2{margin:6px 0 4px;font:700 clamp(25px,4vw,36px) "Space Grotesk",sans-serif}
@@ -287,6 +294,7 @@ footer{background:#070812;border-color:#ffffff12}
     <div class="progress-kpi"><b id="pdAverageTime">—</b><span>ORTALAMA SÜRE</span></div>
     <div class="progress-kpi"><b id="pdCombo">0</b><span>EN İYİ SERİ</span></div>
   </div>
+  <div class="progress-level-line"><div class="progress-level-top"><b id="pdLevelBadge">Seviye 1 · Çırak</b><span id="pdLevelPoints">0 / 100 puan</span></div><div class="progress-track" role="progressbar" aria-label="Sonraki seviyeye ilerleme" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="pdLevelBar" class="progress-fill"></div></div><p id="pdLevelHint" class="progress-note">Soru çözdükçe puan kazan ve seviyeni yükselt.</p></div>
   <div class="progress-lower">
     <article class="progress-panel"><h3>Konu ustalığı</h3>
       <div class="topic-progress"><div class="topic-progress-head"><span>Üslü ifadeler</span><span id="pdUsText">Henüz veri yok</span></div><div class="progress-track" role="progressbar" aria-label="Üslü ifadeler başarı oranı" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="pdUsBar" class="progress-fill"></div></div></div>
@@ -464,10 +472,11 @@ function renderProgressDashboard(){
   const setTopic=(prefix,stats)=>{
     const correct=Number(stats?.correct||0),wrong=Number(stats?.wrong||0),total=correct+wrong;
     const rate=total?Math.round(correct/total*100):0;
-    put(prefix+"Text",total?rate+"% · "+total+" soru":"Henüz veri yok");
+    const mastery=total<3?'Yeni':total<8||rate<60?'Gelişiyor':total>=20&&rate>=85?'Usta':rate>=60?'İyi':'Gelişiyor';
+    put(prefix+"Text",total?mastery+" · "+rate+"% · "+total+" soru":"Yeni · Henüz veri yok");
     const bar=document.getElementById(prefix+"Bar");
     if(bar){bar.style.width=rate+"%";const track=bar.parentElement;if(track)track.setAttribute("aria-valuenow",String(rate))}
-    return {correct,wrong,total,rate};
+    return {correct,wrong,total,rate,mastery};
   };
   if(!user){
     put("pdAccuracy","—");put("pdAnswered","0");put("pdAverageTime","—");put("pdCombo","0");
@@ -482,6 +491,17 @@ function renderProgressDashboard(){
   const times=(user.responseTimes||[]).map(Number).filter(n=>Number.isFinite(n)&&n>0);
   put("pdAverageTime",times.length?(times.reduce((a,b)=>a+b,0)/times.length/1000).toFixed(1)+" sn":"—");
   put("pdCombo",Number(user.bestCombo??user.maxCombo??0));
+  const score=Math.max(0,Number(user.totalScore??user.score??0));
+  const thresholds=[0,100,250,500,1000,2000],names=["Çırak","Keşifçi","Usta adayı","Usta","Uzman","Matematik efsanesi"];
+  let level=0;for(let i=0;i<thresholds.length;i++)if(score>=thresholds[i])level=i;
+  const start=thresholds[level],next=thresholds[level+1];
+  put("pdLevelBadge","Seviye "+(level+1)+" · "+names[level]);
+  const levelBar=document.getElementById("pdLevelBar"),levelTrack=levelBar?.parentElement;
+  const progress=next?Math.max(0,Math.min(100,Math.round((score-start)/(next-start)*100))):100;
+  if(levelBar)levelBar.style.width=progress+"%";
+  if(levelTrack)levelTrack.setAttribute("aria-valuenow",String(progress));
+  put("pdLevelPoints",next?score+" / "+next+" puan":score+" puan · En üst seviye");
+  put("pdLevelHint",next?(next-score)+" puan daha kazanarak "+names[level+1]+" seviyesine ulaşabilirsin.":"Tebrikler, mevcut puan ölçeğindeki en üst seviyedesin.");
   const us=setTopic("pdUs",user.topicStats?.uslu),kok=setTopic("pdKok",user.topicStats?.koklu);
   let advice="Harika başlangıç! İki konudan da birkaç soru çöz; panel hangi alanda daha fazla çalışabileceğini gösterecek.";
   if(total===0) advice="İlk turunu başlat. Her cevabın ardından başarı yüzdelerin ve ortalama cevap süren burada güncellenecek.";
