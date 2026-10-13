@@ -58,7 +58,7 @@ async function loadPlayers() {
         localStorage.getItem(KEY) || '{"players":{},"current":null}'
       );
 
-      state.players = old.players || {};
+      state.players = Object.fromEntries(Object.entries(old.players || {}).map(([key, value]) => [key, {...value, points:0, correct:0, wrong:0, games:0, bestCombo:0, combo:0, quickCorrect:0, radicalCorrect:0, exponentCorrect:0, lastGame:'Henüz oyun oynanmadı'}]));
       state.current = old.current || null;
 
       render();
