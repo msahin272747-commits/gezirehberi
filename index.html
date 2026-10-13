@@ -514,7 +514,21 @@ function renderProgressDashboard(){
   put("pdUserNote","Gösterilen profil: "+(user.username||user.name||"Oyuncu")+" · İstatistikler cevapladığın sorulardan hesaplanır.");
 }
 
-migrate();bank();archiveWeek();render();syncSponsors();
+
+async function syncCentralQuestions(){
+  try{
+    const response=await fetch('/api/data/questions',{cache:'no-store'});
+    if(!response.ok)return;
+    const payload=await response.json();
+    if(!payload.ok||!Array.isArray(payload.questions))return;
+    const local=(data.questions||[]).filter(q=>q.central!==true);
+    const central=payload.questions.filter(q=>q&&q.central===true);
+    data.questions=[...local,...central];
+    save();render();
+  }catch(error){console.warn('Merkezî sorular eşitlenemedi.',error)}
+}
+
+migrate();bank();archiveWeek();render();syncSponsors();syncCentralQuestions();
 </script>
 <script>
 <!-- CENTRAL-RANKING-V2 -->
