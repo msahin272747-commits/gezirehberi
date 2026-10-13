@@ -1,0 +1,22 @@
+{
+  "id": "/",
+  "name": "KÖK & ÜS | Matematik Oyun Akademisi",
+  "short_name": "KÖK & ÜS",
+  "description": "9. sınıf üslü ve köklü ifadeler için oyunlaştırılmış matematik çalışma platformu.",
+  "lang": "tr-TR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#050b1b",
+  "theme_color": "#07152f",
+  "categories": ["education", "games"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
