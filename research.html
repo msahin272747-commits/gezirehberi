@@ -43,6 +43,7 @@
       </div>
     </div>
     <label><input id="consent" type="checkbox" style="width:auto;margin-right:8px"> Araştırmanın amacı, veri toplama süreci ve gönüllülük koşullarını okudum ve katılım koşullarını kabul ediyorum.</label>
+    <p class="muted">Katılımı durdurmak için onay kutusunu kaldırıp ayarları kaydet. Bu işlem yeni kayıtları durdurur; daha önce toplanmış verileri otomatik silmez.</p>
     <button onclick="saveSetup()">Ayarları kaydet</button>
     <button class="alt" onclick="openMain()">Ana matematik sitesine git</button>
     <p id="setupStatus" class="muted"></p>
@@ -76,6 +77,7 @@
     <p class="muted">Ham merkezi veriyi yalnızca Cloudflare Worker'a <code>RESEARCH_ADMIN_KEY</code> secret'ı tanımlandıktan sonra dışa aktar. Bu anahtarı öğrencilere verme.</p>
     <input id="adminKey" type="password" placeholder="Araştırma yönetici anahtarı">
     <button onclick="downloadServer()">Merkezi ham veriyi indir</button>
+    <button class="alt" onclick="downloadServerCsv()">Merkezi ham veriyi CSV indir</button>
     <p id="exportStatus" class="muted"></p>
   </section>
 
@@ -129,7 +131,7 @@ function setup(){
   document.getElementById("localCount").textContent=events().length;
 }
 function saveSetup(){
-  if(!document.getElementById("consent").checked){document.getElementById("setupStatus").textContent="Katılım onayı işaretlenmeden araştırma modu başlatılamaz.";return}
+  if(!document.getElementById("consent").checked){localStorage.removeItem("kokus-research-consent");document.getElementById("setupStatus").textContent="Katılım durduruldu. Bu cihazdan yeni araştırma kaydı gönderilmeyecek; geçmiş kayıtlar otomatik silinmez.";return}
   phase=document.getElementById("phase").value;
   localStorage.setItem("kokus-research-consent","yes");
   localStorage.setItem("kokus-research-group",document.getElementById("group").value);
@@ -199,11 +201,42 @@ function downloadLocal(){
   const csv=[keys.join(","),...rows.map(r=>keys.map(k=>JSON.stringify(r[k]??"")).join(","))].join("\n");
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="kokus-arastirma-verileri.csv";a.click();URL.revokeObjectURL(a.href);
 }
+async function fetchServerEvents(){
+  const key=document.getElementById("adminKey").value.trim();
+  if(!key)throw new Error("Araştırma yönetici anahtarını gir.");
+  const r=await fetch("/api/research/export",{headers:{"x-research-key":key},cache:"no-store"});
+  const type=r.headers.get("content-type")||"";
+  if(!type.includes("application/json"))throw new Error("Sunucudan JSON yanıtı alınamadı. Worker dağıtımını kontrol et.");
+  const j=await r.json();
+  if(!r.ok||!j.ok)throw new Error(j.error||"Dışa aktarma başarısız.");
+  return j.events||[];
+}
+function csvCell(value){
+  let s=String(value??"");
+  if(/^[=+@\-\t\r]/.test(s))s="'"+s;
+  return '"'+s.replace(/"/g,'""')+'"';
+}
 async function downloadServer(){
-  const key=document.getElementById("adminKey").value.trim();if(!key){document.getElementById("exportStatus").textContent="Yönetici anahtarını gir.";return}
-  const r=await fetch("/api/research/export",{headers:{"x-research-key":key},cache:"no-store"});const j=await r.json();
-  if(!r.ok||!j.ok){document.getElementById("exportStatus").textContent=j.error||"Dışa aktarma başarısız.";return}
-  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(j.events,null,2)],{type:"application/json"}));a.download="kokus-arastirma-raw.json";a.click();URL.revokeObjectURL(a.href);document.getElementById("exportStatus").textContent=j.events.length+" olay dışa aktarıldı.";
+  const status=document.getElementById("exportStatus");status.textContent="Merkezî veriler alınıyor…";
+  try{
+    const events=await fetchServerEvents();
+    if(!events.length){status.textContent="Merkezî araştırma verisi bulunamadı.";return}
+    const blob=new Blob([JSON.stringify(events,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="kokus-arastirma-raw.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    status.textContent=events.length+" olay JSON olarak dışa aktarıldı.";
+  }catch(error){status.textContent=error.message||"Dışa aktarma başarısız."}
+}
+async function downloadServerCsv(){
+  const status=document.getElementById("exportStatus");status.textContent="CSV hazırlanıyor…";
+  try{
+    const events=await fetchServerEvents();
+    if(!events.length){status.textContent="Merkezî araştırma verisi bulunamadı.";return}
+    const keys=["participantId","phase","group","questionId","topic","difficulty","correct","responseTimeMs","timestamp"];
+    const rows=[keys.join(","),...events.map(event=>keys.map(key=>csvCell(event[key])).join(","))];
+    const blob=new Blob(["\uFEFF"+rows.join("\r\n")],{type:"text/csv;charset=utf-8"});
+    const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="kokus-arastirma-raw.csv";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    status.textContent=events.length+" olay CSV olarak dışa aktarıldı.";
+  }catch(error){status.textContent=error.message||"CSV dışa aktarma başarısız."}
 }
 setup();
 </script>
