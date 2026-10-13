@@ -1,4 +1,4 @@
-name = "akaling"
+name = "akalmat"
 main = "./dist/worker/index.js"
 compatibility_date = "2026-09-22"
 
