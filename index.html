@@ -310,12 +310,85 @@ const data=Object.assign(defaultData,JSON.parse(localStorage.getItem(KEY)||'{}')
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}
 function migrate(){if((data.version||0)<2)data.questions=(data.questions||[]).filter(q=>!String(q.id||'').startsWith('q-'));data.questions=(data.questions||[]).map(q=>({...q,topic:q.topic==='exponent'?'uslu':q.topic==='radical'?'koklu':q.topic,correctAnswer:q.correctAnswer??'ABCD'[q.correct??0]}));data.rewardQuestions=data.rewardQuestions||[];data.users=(data.users||[]).map(u=>({...u,userId:u.userId||u.id||crypto.randomUUID(),username:u.username||u.name||'',name:u.username||u.name||'',totalScore:u.totalScore??u.score??0,gamesPlayed:u.gamesPlayed??u.games??0,bestCombo:u.bestCombo??u.maxCombo??u.combo??0,history:u.history||[],claimedRewards:u.claimedRewards||[]}));const legacy=localStorage.getItem(USER_KEY);if(legacy&&!data.users.some(u=>u.userId===legacy)){const user=data.users.find(u=>u.username===legacy);if(user)localStorage.setItem(USER_KEY,user.userId)}data.users=(data.users||[]).map(u=>({...u,topicStats:u.topicStats||{uslu:{correct:0,wrong:0},koklu:{correct:0,wrong:0}},responseTimes:u.responseTimes||[],wrongQuestionIds:u.wrongQuestionIds||[]}));data.version=3;}
 function choice(answer,wrong,slot){const options=[answer,...wrong];const target=slot%4;const selected=options.shift();options.splice(target,0,selected);return {options,correctAnswer:'ABCD'[target]}}
-function bank(){if(data.questions.length>=500)return;const uslu=[
- ['2³ × 2⁴ işleminin sonucu?','2⁷',['2¹²','4⁷','2¹']],['(3²)³ işleminin sonucu?','3⁶',['3⁵','9⁶','3⁹']],['10⁻² sayısının ondalık gösterimi?','0,01',['0,2','0,02','100']],['5⁰ + 2³ işleminin sonucu?','9',['8','10','25']],['4³ ÷ 4² işleminin sonucu?','4',['16','1','8']],['(2·3)² işleminin sonucu?','36',['12','6','18']],['8² sayısının asal çarpanlarına ayrılmış biçimi?','2⁶',['2⁵','8²','4³']],['0,0001 sayısının bilimsel gösterimi?','10⁻⁴',['10⁴','0,1⁴','4·10⁻¹']],['(-2)⁴ işleminin sonucu?','16',['-16','8','-8']],['2⁵·4² işleminin sonucu?','2⁹',['2⁷','8⁷','4⁷']]
- ];const koklu=[
- ['√72 en sade hâliyle?','6√2',['3√8','4√3','2√18']],['√45 en sade hâliyle?','3√5',['5√9','9√5','√15']],['√27 + √12 işleminin sonucu?','5√3',['3√3','√39','6√3']],['√50 - √8 işleminin sonucu?','3√2',['√42','7√2','√2']],['√(49/81) işleminin sonucu?','7/9',['49/81','9/7','14/81']],['3√5 sayısının karesi?','45',['15','9√5','30']],['√18 · √2 işleminin sonucu?','6',['√36','3','36']],['√75 / √3 işleminin sonucu?','5',['√25','25','√72']],['√0,49 işleminin sonucu?','0,7',['0,49','7','0,07']],['√108 en sade hâliyle?','6√3',['3√12','9√3','√36']]
- ];
- const add=(topic,items,prefix)=>{for(let n=0;n<250;n++){const t=items[n%items.length],q=choice(t[1],t[2],n);data.questions.push({id:`${prefix}-${n+1}`,topic,text:t[0],options:q.options,correctAnswer:q.correctAnswer,explanation:`${t[1]} doğru sonuçtur. İşlemi konu kuralını kullanarak adım adım kontrol et.`,difficulty:n%5===0?'zor':'orta',kind:n%10===0?'yorum':'işlem'});}};add('uslu',uslu,'uslu');add('koklu',koklu,'koklu');if(!data.questions.some(q=>q.boss)){const boss=[['uslu','(2³ × 2⁻¹)² işleminin sonucu?','16',['4','32','64']],['uslu','(3²)³ ÷ 3⁴ işleminin sonucu?','9',['3','27','81']],['uslu','2³ + 2³ × 2 işleminin sonucu?','24',['16','32','64']],['uslu','4⁻¹ + 2⁻¹ işleminin sonucu?','3/4',['1/8','1/2','3/8']],['koklu','√75 + √12 - √3 işleminin sonucu?','6√3',['4√3','5√3','7√3']],['koklu','(√8 × √18) ÷ √4 işleminin sonucu?','6',['3','9','12']],['koklu','√98 - √8 + √50 işleminin sonucu?','10√2',['8√2','12√2','5√2']],['koklu','√(81/16) + √(1/4) işleminin sonucu?','11/4',['9/4','5/2','13/4']]];boss.forEach((t,i)=>{const q=choice(t[2],t[3],i);data.questions.push({id:`boss-${i+1}`,topic:t[0],text:t[1],options:q.options,correctAnswer:q.correctAnswer,explanation:'İşlem kurallarını sırayla uygulayıp sonucu sadeleştir.',difficulty:'boss',kind:'boss',boss:true})})}save();}
+function bank(){
+  // Replace the old repeating seed bank once; preserve teacher/admin-added questions.
+  if((data.version||0)<4){
+    data.questions=(data.questions||[]).filter(q=>!(/^(uslu|koklu)-\d+$/.test(String(q.id||''))||(/^boss-\d+$/.test(String(q.id||''))&&q.kind==='boss')));
+    data.version=4;
+  }
+  const existing=new Set((data.questions||[]).map(q=>String(q.id)));
+  const existingTexts=new Set((data.questions||[]).map(q=>String(q.text||'').trim().toLocaleLowerCase('tr-TR')));
+  const add=(id,topic,text,answer,wrongs,explanation,difficulty='orta',boss=false)=>{
+    if(existing.has(id)||existingTexts.has(text.trim().toLocaleLowerCase('tr-TR')))return;
+    const slot=(id.split('').reduce((n,ch)=>n+ch.charCodeAt(0),0))%4;
+    const options=choice(String(answer),wrongs.map(String),slot);
+    const q={id,topic,text,options:options.options,correctAnswer:options.correctAnswer,explanation,difficulty,kind:boss?'boss':'işlem'};
+    if(boss)q.boss=true;
+    data.questions.push(q);existing.add(id);existingTexts.add(text.trim().toLocaleLowerCase('tr-TR'));
+  };
+  const expCandidates=[];
+  for(let base=2;base<=9;base++)for(let m=1;m<=5;m++)for(let n=1;n<=5;n++){
+    const ans=m+n;expCandidates.push({text:`${base}^${m} × ${base}^${n} işleminin sonucu?`,answer:`${base}^${ans}`,wrong:[`${base}^${m*n}`,`${base}^${Math.abs(m-n)}`,`${base+base}^${ans}`],ex:`Aynı tabanlı üslü ifadeler çarpılırken üsler toplanır: ${m}+${n}=${ans}.`,diff:(m+n>=8?'zor':'orta')});
+  }
+  for(let base=2;base<=9;base++)for(let m=2;m<=8;m++)for(let n=1;n<m;n++){
+    const ans=m-n;expCandidates.push({text:`${base}^${m} ÷ ${base}^${n} işleminin sonucu?`,answer:`${base}^${ans}`,wrong:[`${base}^${m+n}`,`${base}^${m*n}`,`${base}^${n-m}`],ex:`Aynı tabanlı üslü ifadeler bölünürken üsler çıkarılır: ${m}-${n}=${ans}.`,diff:(m>=6?'zor':'orta')});
+  }
+  for(let base=2;base<=9;base++)for(let m=2;m<=4;m++)for(let n=2;n<=3;n++){
+    expCandidates.push({text:`(${base}^${m})^${n} işleminin sonucu?`,answer:`${base}^${m*n}`,wrong:[`${base}^${m+n}`,`${base}^${m*n-1}`,`${base}^${m+n+1}`],ex:`Bir üslü ifadenin kuvveti alınırken üsler çarpılır: ${m}×${n}=${m*n}.`,diff:'zor'});
+  }
+  for(let base=2;base<=9;base++){
+    expCandidates.push({text:`${base}^0 + ${base}^1 işleminin sonucu?`,answer:String(1+base),wrong:[String(base),String(base*2),String(base+1+base)],ex:`Sıfırıncı kuvvet (taban sıfır değilse) 1'dir; ${base}^1=${base}. Toplam ${base+1}.`,diff:'orta'});
+    expCandidates.push({text:`${base}^-1 sayısının kesir biçimi hangisidir?`,answer:`1/${base}`,wrong:[String(-base),`${base}/1`,`-1/${base}`],ex:`Negatif üs, tabanın çarpmaya göre tersini verir: ${base}^-1=1/${base}.`,diff:'zor'});
+  }
+  const usedExp=new Set();let expCount=0;
+  // Interleave the different rules so the bank does not contain long blocks of one pattern.
+  for(let i=0;i<expCandidates.length&&expCount<250;i++){
+    const idx=(i*73)%expCandidates.length,q=expCandidates[idx],key=q.text;
+    if(usedExp.has(key))continue;usedExp.add(key);add('gen-uslu-'+String(++expCount).padStart(3,'0'),'uslu',q.text,q.answer,q.wrong,q.ex,q.diff);
+  }
+  const primes=[2,3,5,7,11,13];
+  const radicalCandidates=[];
+  for(let k=2;k<=18;k++)for(const p of primes){
+    radicalCandidates.push({text:`√(${k*k*p}) en sade hâliyle?`,answer:`${k}√${p}`,wrong:[`${k*p}√${p}`,`${k}+${p}`,`${k}√${p*p}`],ex:`Karekök içindeki tam kareyi dışarı çıkar: √(${k*k}×${p})=${k}√${p}.`,diff:k>=10?'zor':'orta'});
+  }
+  for(const p of primes)for(let x=1;x<=12;x++)for(let y=1;y<=12;y++){
+    radicalCandidates.push({text:`√(${x*x*p}) + √(${y*y*p}) işleminin sonucu?`,answer:`${x+y}√${p}`,wrong:[`${x*y}√${p}`,`${x+y}√${p*p}`,`${x+y+p}√${p}`],ex:`Benzer köklü ifadelerde katsayılar toplanır: ${x}√${p}+${y}√${p}=${x+y}√${p}.`,diff:(x+y>=15?'zor':'orta')});
+    if(x>y)radicalCandidates.push({text:`√(${x*x*p}) - √(${y*y*p}) işleminin sonucu?`,answer:`${x-y}√${p}`,wrong:[`${x+y}√${p}`,`${x*y}√${p}`,`${x-y+p}√${p}`],ex:`Benzer köklü ifadelerde katsayılar çıkarılır: ${x}√${p}-${y}√${p}=${x-y}√${p}.`,diff:'zor'});
+  }
+  for(let x=2;x<=18;x++)for(let y=2;y<=18;y++){
+    radicalCandidates.push({text:`√${x*x} × √${y*y} işleminin sonucu?`,answer:String(x*y),wrong:[String(x+y),String((x*y)*(x*y)),String(Math.abs(x-y))],ex:`√(${x*x})=${x} ve √(${y*y})=${y}; çarpım ${x}×${y}=${x*y}.`,diff:(x*y>=150?'zor':'orta')});
+  }
+  const usedRad=new Set();let radCount=0;
+  for(let i=0;i<radicalCandidates.length&&radCount<250;i++){
+    const idx=(i*137)%radicalCandidates.length,q=radicalCandidates[idx],key=q.text;
+    if(usedRad.has(key))continue;usedRad.add(key);add('gen-koklu-'+String(++radCount).padStart(3,'0'),'koklu',q.text,q.answer,q.wrong,q.ex,q.diff);
+  }
+  // Dedicated challenge items are genuinely different questions, not repeated easy items.
+  const bossItems=[
+    ['uslu','(2^5 × 2^-2)^2 işleminin sonucu?','64',['32','16','128'],'Önce aynı tabanlı üsleri birleştir: 2^(5-2)=2³; sonra karesini al: 2⁶=64.'],
+    ['uslu','(3^4 ÷ 3^2)^3 işleminin sonucu?','729',['81','243','2187'],'Önce bölmede üsleri çıkar: 3²; ardından (3²)³=3⁶=729.'],
+    ['uslu','2^-2 + 2^-3 işleminin sonucu?','3/8',['1/5','3/16','5/8'],'Negatif üsleri kesre çevir: 1/4+1/8=3/8.'],
+    ['uslu','5^3 × 5^-1 ÷ 5^2 işleminin sonucu?','1',['5','25','1/5'],'Üsleri sırayla topla ve çıkar: 3+(-1)-2=0; 5⁰=1.'],
+    ['uslu','(2^3)^2 ÷ 2^4 işleminin sonucu?','4',['8','16','2'],'Kuvvetin kuvvetinde üsler çarpılır: 2⁶÷2⁴=2²=4.'],
+    ['uslu','4^3 ÷ 2^4 işleminin sonucu?','4',['2','8','16'],'4³=2⁶; 2⁶÷2⁴=2²=4.'],
+    ['uslu','(10^-2)^2 işleminin ondalık gösterimi?','0,0001',['0,01','0,001','0,1'],'(10⁻²)²=10⁻⁴=0,0001.'],
+    ['uslu','2^4 + 2^4 + 2^4 işleminin sonucu?','48',['32','64','24'],'Her terim 16 eder; 16+16+16=48.'],
+    ['uslu','(3^2 × 3^3) ÷ 3^4 işleminin sonucu?','3',['9','27','1'],'Üsler: 2+3-4=1; sonuç 3¹=3.'],
+    ['uslu','2^3 × 4^2 işleminin sonucu?','128',['64','32','256'],'4²=2⁴; 2³×2⁴=2⁷=128.'],
+    ['koklu','√72 + √32 işleminin sonucu?','10√2',['8√2','6√2','12√2'],'√72=6√2 ve √32=4√2; toplam 10√2.'],
+    ['koklu','3√12 - √27 işleminin sonucu?','3√3',['√3','6√3','9√3'],'3√12=6√3 ve √27=3√3; fark 3√3.'],
+    ['koklu','√48 × √3 işleminin sonucu?','12',['6','4√3','24'],'√48×√3=√144=12.'],
+    ['koklu','√200 ÷ √2 işleminin sonucu?','10',['5','20','100'],'√200÷√2=√100=10.'],
+    ['koklu','(√5 + √20) işleminin sonucu?','3√5',['5√5','√25','4√5'],'√20=2√5; √5+2√5=3√5.'],
+    ['koklu','2√18 + √50 - √8 işleminin sonucu?','9√2',['7√2','11√2','5√2'],'2√18=6√2, √50=5√2, √8=2√2; sonuç 9√2.'],
+    ['koklu','√(3/5) × √(15/4) işleminin sonucu?','3/2',['3/4','9/4','√18/20'],'Kökleri birleştir: √(45/20)=√(9/4)=3/2.'],
+    ['koklu','(√7)^2 + √81 işleminin sonucu?','16',['14','10','18'],'(√7)²=7 ve √81=9; toplam 16.'],
+    ['koklu','√(144/25) - √(16/25) işleminin sonucu?','4/5',['8/5','2/5','1/5'],'12/5-4/5=8/5.'],
+    ['koklu','√98 + √8 - √50 işleminin sonucu?','5√2',['7√2','3√2','10√2'],'7√2+2√2-5√2=4√2.']
+  ];
+  bossItems.forEach((q,i)=>add('gen-boss-'+String(i+1).padStart(2,'0'),q[0],q[1],q[2],q[3],q[4],'boss',true));
+  save();
+}
 function changePlayerName(){const input=document.getElementById('playerName');if(!input)return;const name=normalizeUsername(input.value);if(name.length<2||name.length>24){alert('Kullanıcı adı 2 ile 24 karakter arasında olmalı.');input.focus();return}Promise.resolve(setPlayerName(name)).then(()=>{input.value=name;input.blur()})}
 function normalizeUsername(value){return value.trim().replace(/\s+/g,' ')}
 function currentUser(){const key=localStorage.getItem(USER_KEY)||'';return data.users.find(u=>u.userId===key)||data.users.find(u=>String(u.username||u.name||'').toLocaleLowerCase('tr-TR')===String(key).toLocaleLowerCase('tr-TR'))}
