@@ -321,7 +321,7 @@ function bank(){
   const add=(id,topic,text,answer,wrongs,explanation,difficulty='orta',boss=false)=>{
     if(existing.has(id)||existingTexts.has(text.trim().toLocaleLowerCase('tr-TR')))return;
     const slot=(id.split('').reduce((n,ch)=>n+ch.charCodeAt(0),0))%4;
-    const options=choice(String(answer),wrongs.map(String),slot);
+    const clean=[...new Set(wrongs.map(String).filter(x=>x!==String(answer)))];while(clean.length<3){const candidate=String(answer)+' + '+(clean.length+1);if(candidate!==String(answer)&&!clean.includes(candidate))clean.push(candidate)}const options=choice(String(answer),clean.slice(0,3),slot);
     const q={id,topic,text,options:options.options,correctAnswer:options.correctAnswer,explanation,difficulty,kind:boss?'boss':'işlem'};
     if(boss)q.boss=true;
     data.questions.push(q);existing.add(id);existingTexts.add(text.trim().toLocaleLowerCase('tr-TR'));
@@ -383,8 +383,8 @@ function bank(){
     ['koklu','2√18 + √50 - √8 işleminin sonucu?','9√2',['7√2','11√2','5√2'],'2√18=6√2, √50=5√2, √8=2√2; sonuç 9√2.'],
     ['koklu','√(3/5) × √(15/4) işleminin sonucu?','3/2',['3/4','9/4','√18/20'],'Kökleri birleştir: √(45/20)=√(9/4)=3/2.'],
     ['koklu','(√7)^2 + √81 işleminin sonucu?','16',['14','10','18'],'(√7)²=7 ve √81=9; toplam 16.'],
-    ['koklu','√(144/25) - √(16/25) işleminin sonucu?','4/5',['8/5','2/5','1/5'],'12/5-4/5=8/5.'],
-    ['koklu','√98 + √8 - √50 işleminin sonucu?','5√2',['7√2','3√2','10√2'],'7√2+2√2-5√2=4√2.']
+    ['koklu','√(144/25) - √(16/25) işleminin sonucu?','8/5',['4/5','2/5','1/5'],'12/5-4/5=8/5.'],
+    ['koklu','√98 + √8 - √50 işleminin sonucu?','4√2',['7√2','3√2','10√2'],'7√2+2√2-5√2=4√2.']
   ];
   bossItems.forEach((q,i)=>add('gen-boss-'+String(i+1).padStart(2,'0'),q[0],q[1],q[2],q[3],q[4],'boss',true));
   save();
